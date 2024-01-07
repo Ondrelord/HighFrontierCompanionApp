@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Xamarin.Essentials;
 using Xamarin.Forms;
 using Xamarin.Forms.Internals;
+using Xamarin.Forms.Shapes;
 using Xamarin.Forms.Xaml;
 
 namespace HFCA
@@ -99,7 +100,7 @@ namespace HFCA
         public string burnsLeftAllLabelText { get => BurnsLeftAll.ToString() + " (" + stepsLeft.ToString() + ")"; }
         public Color turnAvailability { get => freeTurns > 0 ? Color.Green : BurnsLeftThisTurn > 1 ? Color.DeepPink : Color.DarkRed; }
         public string turnAvailabilityLabel { get => freeTurns > 0 ? "Turn\n(Free)" : "Turn"; }
-        public string endTurnButtonText { get => LeftoverBurnedFuel > 0d ? "End\nTurn\n Leftover Burn : " + Math.Round(LeftoverBurnedFuel, 2).ToString() : "End\nTurn"; }
+        public string endTurnButtonText { get => LeftoverBurnedFuel > 0d ? "End Turn\n (loose " + Math.Round(1-LeftoverBurnedFuel, 2).ToString() +" step)" : "End\nTurn"; }
         public bool AfterBurnButtonEnable { get => !afterburnerUsed; }
 
         public Page1()
@@ -152,26 +153,29 @@ namespace HFCA
             Grid buttonGrid = new Grid()
             {
                 HorizontalOptions = LayoutOptions.FillAndExpand,
-                HeightRequest = 200
+                HeightRequest = 150
             };
             buttonGrid.ColumnDefinitions.Add(new ColumnDefinition());
             buttonGrid.ColumnDefinitions.Add(new ColumnDefinition());
             buttonGrid.ColumnDefinitions.Add(new ColumnDefinition());
             buttonGrid.ColumnDefinitions.Add(new ColumnDefinition());
             buttonGrid.ColumnDefinitions.Add(new ColumnDefinition());
-            buttonGrid.RowDefinitions.Add(new RowDefinition() { Height = 100 });
-            buttonGrid.RowDefinitions.Add(new RowDefinition() { Height = 100 });
+            buttonGrid.ColumnDefinitions.Add(new ColumnDefinition());
+            buttonGrid.RowDefinitions.Add(new RowDefinition() { Height = 75 });
+            buttonGrid.RowDefinitions.Add(new RowDefinition() { Height = 75 });
             mainPageLayout.Children.Add(buttonGrid);
 
             Button EndTurnButton = new Button()
             {
                 Text = "End\nturn",
                 HorizontalOptions = LayoutOptions.Start,
-                HeightRequest = 100,
+                VerticalOptions = LayoutOptions.Start,
+                HeightRequest = 75,
                 WidthRequest = 150,
                 BackgroundColor = Color.Blue,
                 BorderColor = Color.White,
-                BorderWidth = 8,
+                BorderWidth = 5,
+                FontSize = 18,
                 BindingContext = this,
             };
             EndTurnButton.Clicked += EndTurn_Clicked;
@@ -182,34 +186,36 @@ namespace HFCA
             {
                 Text = "Turn",
                 HorizontalOptions = LayoutOptions.End,
-                HeightRequest = 100,
+                VerticalOptions = LayoutOptions.End,
+                HeightRequest = 75,
                 WidthRequest = 150,
                 BackgroundColor = Color.Green,
                 BorderColor = Color.White,
-                BorderWidth = 8,
+                BorderWidth = 5,
+                FontSize = 18,
                 BindingContext = this,
             };
             TurnButton.Clicked += TurnButton_Clicked;
             TurnButton.SetBinding(Button.BackgroundColorProperty, "turnAvailability");
             TurnButton.SetBinding(Button.TextProperty, "turnAvailabilityLabel");
-            buttonGrid.Children.Add(TurnButton, 3, 5, 0, 1);
+            buttonGrid.Children.Add(TurnButton, 4, 6, 0, 1);
 
             Button BurnButton = new Button()
             {
                 Text = "BURN!",
                 HorizontalOptions = LayoutOptions.Center,
-                HeightRequest = 200,
-                WidthRequest = 200,
-                CornerRadius = 100,
+                VerticalOptions= LayoutOptions.Center,
+                HeightRequest = 150,
+                WidthRequest = 150,
+                CornerRadius = 75,
                 BackgroundColor = Color.DeepPink,
                 BorderColor = Color.White,
-                BorderWidth = 8
+                BorderWidth = 8,
+                FontSize = 40,
             };
             BurnButton.Clicked += BurnButton_Clicked;
-            buttonGrid.Children.Add(BurnButton, 1,4,0,2);
-
+            buttonGrid.Children.Add(BurnButton, 1,5,0,2);
             
-
             this.Content = mainPageLayout;
         }
 
@@ -508,7 +514,6 @@ namespace HFCA
                 FuelTanks = possibleSteps[index] - DryMass;
             }
             LeftoverBurnedFuel = 0;
-
         }
         private void HelioZonePicked (object sender, EventArgs e)
         {
