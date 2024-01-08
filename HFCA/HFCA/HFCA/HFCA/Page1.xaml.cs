@@ -16,10 +16,21 @@ namespace HFCA
     public partial class Page1 : ContentPage
     {
         #region test
-        private double fuelUse = 1.5;
-        private bool solarPowered = true;
-        private int afterburnerStrenght = 1;
-        
+        private List<Card> activeCards = new List<Card>()
+        { 
+            new Card()
+            {
+                Name = "TEST thruster",
+                Type = CardType.Thruster,
+                Thrust = 2,
+                FuelUse = 1.5,
+                AfterBurn = 1,
+                Mass = 4,
+                FreeTurns = 1,
+                IsSolarPowered = true,
+                IsPushable = false,
+            }  
+        };
         #endregion
 
         private readonly List<double> possibleSteps = new List<double>{
@@ -49,6 +60,8 @@ namespace HFCA
             "Neptun"
         };
 
+        private Card ActiveThruster { get { return activeCards.Single(x => x.Type == CardType.Thruster); } }
+
         private int dryMass;
         private int minRadHard;
         private int netThrust;
@@ -66,14 +79,14 @@ namespace HFCA
         public int MinRadHard { get { return minRadHard; } set { minRadHard = value; OnPropertyChanged(nameof(MinRadHard)); } }
         public double FuelTanks { get { return fuelTanks; } set { fuelTanks = value; OnPropertyChanged(nameof(FuelTanks)); OnPropertyChanged(nameof(fuelTanksLabelText)); OnPropertyChanged(nameof(massLabelText)); OnPropertyChanged(nameof(burnsLeftAllLabelText)); OnPropertyChanged(nameof(NetThrust)); } }
         public int BurnsLeftThisTurn { get { return burnsLeftThisTurn; } set { burnsLeftThisTurn = value; OnPropertyChanged(nameof(BurnsLeftThisTurn)); OnPropertyChanged(nameof(turnAvailability)); } }
-        public int BurnsLeftAll { get { return (int)(stepsLeft / fuelUse); } }
+        public int BurnsLeftAll { get { return (int)(stepsLeft / ActiveThruster.FuelUse); } }
         public int FreeTurns { get { return freeTurns; } set { freeTurns = value; OnPropertyChanged(nameof(turnAvailabilityLabel)); OnPropertyChanged(nameof(turnAvailability)); } }
         public double LeftoverBurnedFuel { get => leftoverBurnedFuel; set { leftoverBurnedFuel = value; OnPropertyChanged(nameof(endTurnButtonText)); } }
         public int NetThrust { 
             get 
             {
                 var final = netThrust;
-                if (solarPowered)
+                if (ActiveThruster.IsSolarPowered)
                 {
                     if (solarBonus < -5)
                         return 0;
@@ -82,7 +95,7 @@ namespace HFCA
                 if (powerSatPushed)
                     ++final;
                 if (afterburnerUsed)
-                    final += afterburnerStrenght;
+                    final += ActiveThruster.AfterBurn;
 
                 return Math.Min(final, 15); // max value 15
             } 
@@ -102,6 +115,7 @@ namespace HFCA
         public string turnAvailabilityLabel { get => freeTurns > 0 ? "Turn\n(Free)" : "Turn"; }
         public string endTurnButtonText { get => LeftoverBurnedFuel > 0d ? "End Turn\n (loose " + Math.Round(1-LeftoverBurnedFuel, 2).ToString() +" step)" : "End\nTurn"; }
         public bool AfterBurnButtonEnable { get => !afterburnerUsed; }
+        public bool isPushable { get => ActiveThruster.IsPushable; }
 
         public Page1()
         {
@@ -147,7 +161,20 @@ namespace HFCA
             SetFuelTanks(grid);
             SetBurnsLeft(grid);
 
-            ListView CardList = new ListView();
+
+            ListView CardList = new ListView()
+            {
+                ItemsSource = activeCards,
+                ItemTemplate = new DataTemplate(() => {
+                    Label nameLabel = new Label();
+                    nameLabel.SetBinding(Label.TextProperty, "Name");
+
+                    return new ViewCell
+                    {
+                        View = nameLabel,
+                    };
+                })
+            };
             mainPageLayout.Children.Add(CardList);
             
             Grid buttonGrid = new Grid()
@@ -366,14 +393,16 @@ namespace HFCA
                 Text = "P-Sat",
                 BackgroundColor = Color.DarkRed,
                 HorizontalOptions = LayoutOptions.Start,
-                WidthRequest = 50
+                WidthRequest = 50,
+                BindingContext= this,
             };
             PowerSatButton.Clicked += PowerSatButton_Clicked;
+            PowerSatButton.SetBinding(Button.IsEnabledProperty, "isPushable");
             netThrustStack.Children.Add(PowerSatButton);
 
             Button AfterBurnButton = new Button()
             {
-                Text = afterburnerStrenght.ToString(),
+                Text = ActiveThruster.AfterBurn.ToString(),
                 BackgroundColor = Color.OrangeRed,
                 IsEnabled = !afterburnerUsed,
                 BindingContext = this,
@@ -387,6 +416,7 @@ namespace HFCA
 
         private void AfterBurnButton_Clicked(object sender, EventArgs e)
         {
+            //TODO upravit pre normal a GW pohony
             afterburnerUsed = true;
             OnPropertyChanged(nameof(AfterBurnButtonEnable));
 
@@ -462,7 +492,7 @@ namespace HFCA
             }
             --BurnsLeftThisTurn;
 
-            LeftoverBurnedFuel += fuelUse;
+            LeftoverBurnedFuel += ActiveThruster.FuelUse;
             int burnedFuel = (int)LeftoverBurnedFuel;
             LeftoverBurnedFuel -= burnedFuel;
 
@@ -500,6 +530,7 @@ namespace HFCA
 
             //if (freeTurns == 0 && burnsLeftThisTurn < 2) ((Button)sender).BackgroundColor = Color.DarkRed;
         }
+        
         private void EndTurn_Clicked(object sender, EventArgs e)
         {
             afterburnerUsed = false;
@@ -515,9 +546,10 @@ namespace HFCA
             }
             LeftoverBurnedFuel = 0;
         }
+
         private void HelioZonePicked (object sender, EventArgs e)
         {
-            if (solarPowered)
+            if (ActiveThruster.IsSolarPowered)
                 solarBonus = -1 * (((Picker)sender).SelectedIndex - 2);
             else
                 solarBonus = 0;
