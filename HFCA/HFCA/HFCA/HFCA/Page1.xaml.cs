@@ -31,6 +31,7 @@ namespace HFCA
                 IsPushable = false,
             }  
         };
+        private List<Card> inactiveCards = new List<Card>();
         #endregion
 
         private readonly List<double> possibleSteps = new List<double>{
@@ -61,72 +62,89 @@ namespace HFCA
         };
 
         private Card ActiveThruster { get { return activeCards.Single(x => x.Type == CardType.Thruster); } }
-
-        private int dryMass;
-        private int minRadHard;
-        private int netThrust;
-        private double fuelTanks;
-        private int burnsLeftThisTurn;
-        private int freeTurns;
-        private double leftoverBurnedFuel;
-        
         private int solarBonus;
         private bool afterburnerUsed = false;
         private bool powerSatPushed = false;
 
-        public int DryMass { get { return dryMass; } set { dryMass = value; OnPropertyChanged(nameof(DryMass)); OnPropertyChanged(nameof(massLabelText)); OnPropertyChanged(nameof(burnsLeftAllLabelText)); } }
+        //MASS
+        private int dryMass;
+        public int DryMass { get { return dryMass; } set { dryMass = value;  OnPropertyChanged(nameof(massLabelText)); OnPropertyChanged(nameof(burnsLeftAllLabelText)); OnPropertyChanged(nameof(NetThrust)); OnPropertyChanged(nameof(BurnsLeftThisTurn)); } }
         public double WetMass { get { return DryMass + FuelTanks; } }
+        public string massLabelText { get => DryMass.ToString() + " / " + ((((int)WetMass == 0) && WetMass > 0) ? ToStepFractionCount() : ((int)WetMass).ToString() + " " + ToStepFractionCount()); }
+        
+        //RAD HARD
+        private int minRadHard;
         public int MinRadHard { get { return minRadHard; } set { minRadHard = value; OnPropertyChanged(nameof(MinRadHard)); } }
-        public double FuelTanks { get { return fuelTanks; } set { fuelTanks = value; OnPropertyChanged(nameof(FuelTanks)); OnPropertyChanged(nameof(fuelTanksLabelText)); OnPropertyChanged(nameof(massLabelText)); OnPropertyChanged(nameof(burnsLeftAllLabelText)); OnPropertyChanged(nameof(NetThrust)); } }
-        public int BurnsLeftThisTurn { get { return burnsLeftThisTurn; } set { burnsLeftThisTurn = value; OnPropertyChanged(nameof(BurnsLeftThisTurn)); OnPropertyChanged(nameof(turnAvailability)); } }
+        
+        //FUEL TANKS
+        private double fuelTanks;
+        public double FuelTanks { get { return fuelTanks; } set { fuelTanks = value; OnPropertyChanged(nameof(FuelTanks)); OnPropertyChanged(nameof(fuelTanksLabelText)); OnPropertyChanged(nameof(massLabelText)); OnPropertyChanged(nameof(burnsLeftAllLabelText)); OnPropertyChanged(nameof(BurnsLeftThisTurn)); OnPropertyChanged(nameof(NetThrust)); } }
+        public string fuelTanksLabelText { get => (((int)FuelTanks) == 0 && FuelTanks > 0) ? ToStepFractionCount() : ((int)FuelTanks).ToString() + " " + ToStepFractionCount(); }
+
+        //BURNS LEFT
+        private int burnsUsedThisTurn;
+                
+        public int BurnsLeftThisTurn { get { return Math.Min(NetThrust, BurnsLeftAll) - burnsUsedThisTurn; } }
         public int BurnsLeftAll { get { return (int)(stepsLeft / ActiveThruster.FuelUse); } }
+        public int stepsLeft { get => possibleSteps.Count(x => x >= DryMass && x < WetMass); }
+        public string burnsLeftAllLabelText { get => BurnsLeftAll.ToString() + " (" + stepsLeft.ToString() + ")"; }
+
+        //FREE TURNS
+        private int freeTurns;
         public int FreeTurns { get { return freeTurns; } set { freeTurns = value; OnPropertyChanged(nameof(turnAvailabilityLabel)); OnPropertyChanged(nameof(turnAvailability)); } }
+        public Color turnAvailability { get => freeTurns > 0 ? Color.Green : BurnsLeftThisTurn > 1 ? Color.DeepPink : Color.DarkRed; }
+        public string turnAvailabilityLabel { get => freeTurns > 0 ? "Turn\n(Free)" : "Turn"; }
+
+        //LEFTOVER BURN
+        private double leftoverBurnedFuel;
         public double LeftoverBurnedFuel { get => leftoverBurnedFuel; set { leftoverBurnedFuel = value; OnPropertyChanged(nameof(endTurnButtonText)); } }
+
+        //NET THRUST
+        private int netThrust;
+        private int finalNetThrust;
         public int NetThrust { 
             get 
             {
-                var final = netThrust;
+                finalNetThrust = ActiveThruster.Thrust;
                 if (ActiveThruster.IsSolarPowered)
                 {
                     if (solarBonus < -5)
                         return 0;
-                    final += solarBonus;
+                    finalNetThrust += solarBonus;
                 }
                 if (powerSatPushed)
-                    ++final;
+                    ++finalNetThrust;
                 if (afterburnerUsed)
-                    final += ActiveThruster.AfterBurn;
+                    finalNetThrust += ActiveThruster.AfterBurn;
+                if (WetMass < 2)
+                    finalNetThrust += 2;
+                else if (WetMass < 4.5)
+                    finalNetThrust += 1;
+                else if (WetMass < 8.2)
+                    finalNetThrust += 0;
+                else if (WetMass < 17)
+                    finalNetThrust -= 1;
+                else finalNetThrust -= 2;
 
-                return Math.Min(final, 15); // max value 15
+                return Math.Min(finalNetThrust, 15); // max value 15
             } 
             set 
             { 
                 netThrust = value; 
                 OnPropertyChanged(nameof(NetThrust));
                 OnPropertyChanged(nameof(BurnsLeftThisTurn));
+                OnPropertyChanged(nameof(turnAvailabilityLabel));
             } }
 
-
-        public string fuelTanksLabelText { get => (((int)FuelTanks) == 0 && FuelTanks > 0) ? ToStepFractionCount() : ((int)FuelTanks).ToString() + " " + ToStepFractionCount(); }
-        public string massLabelText { get => DryMass.ToString() + " / " + ((((int)WetMass == 0) && WetMass > 0) ? ToStepFractionCount() :((int)WetMass).ToString() + " " + ToStepFractionCount()); }
-        public int stepsLeft { get => possibleSteps.Count(x => x >= DryMass && x < WetMass); }
-        public string burnsLeftAllLabelText { get => BurnsLeftAll.ToString() + " (" + stepsLeft.ToString() + ")"; }
-        public Color turnAvailability { get => freeTurns > 0 ? Color.Green : BurnsLeftThisTurn > 1 ? Color.DeepPink : Color.DarkRed; }
-        public string turnAvailabilityLabel { get => freeTurns > 0 ? "Turn\n(Free)" : "Turn"; }
+        
         public string endTurnButtonText { get => LeftoverBurnedFuel > 0d ? "End Turn\n (loose " + Math.Round(1-LeftoverBurnedFuel, 2).ToString() +" step)" : "End\nTurn"; }
-        public bool AfterBurnButtonEnable { get => !afterburnerUsed; }
+        public bool AfterBurnButtonEnable { get => !afterburnerUsed 
+                || ((ActiveThruster.Type == CardType.Thruster || ActiveThruster.Type == CardType.RegolitThruster) && stepsLeft < ActiveThruster.AfterBurn)
+                || ActiveThruster.Type == CardType.GwTwThruster && stepsLeft < 1; }
         public bool isPushable { get => ActiveThruster.IsPushable; }
 
         public Page1()
         {
-            //TEST data
-            DryMass = 1;
-            MinRadHard = 1;
-            NetThrust = 3;
-            fuelTanks = 1;
-            freeTurns = 1;
-            burnsLeftThisTurn = Math.Min(NetThrust, BurnsLeftAll);
-
             InitializeComponent();
             BindingContext = this;
             SetupPage();
@@ -173,8 +191,11 @@ namespace HFCA
                     {
                         View = nameLabel,
                     };
-                })
+                }),
+                BindingContext = this,
             };
+            CardList.DescendantAdded += CardList_Changed;
+            CardList.DescendantRemoved += CardList_Changed;
             mainPageLayout.Children.Add(CardList);
             
             Grid buttonGrid = new Grid()
@@ -242,8 +263,16 @@ namespace HFCA
             };
             BurnButton.Clicked += BurnButton_Clicked;
             buttonGrid.Children.Add(BurnButton, 1,5,0,2);
-            
+
+            CardList_Changed(CardList, null); // TEST
             this.Content = mainPageLayout;
+        }
+
+        private void CardList_Changed(object sender, ElementEventArgs e)
+        {
+            var allCards = activeCards.Concat(inactiveCards);
+            DryMass = allCards.Sum(x => x.Mass);
+            MinRadHard = allCards.Min(x => x.RadHard);
         }
 
         private void SetBurnsLeft(Grid grid)
@@ -416,15 +445,16 @@ namespace HFCA
 
         private void AfterBurnButton_Clicked(object sender, EventArgs e)
         {
-            //TODO upravit pre normal a GW pohony
             afterburnerUsed = true;
             OnPropertyChanged(nameof(AfterBurnButtonEnable));
-
-            var steps = possibleSteps.IndexOf(WetMass);
-            var index = steps > possibleSteps.IndexOf(24) ? steps - 2 : steps - 1;
-            FuelTanks = possibleSteps[index] - DryMass;
-
-            BurnsLeftThisTurn = Math.Min(NetThrust, BurnsLeftAll);
+            
+            int stepCount = ActiveThruster.Type == CardType.GwTwThruster ? ActiveThruster.AfterBurn : 1;
+            for (int i = 0; i < stepCount; ++i)
+            {
+                var steps = possibleSteps.IndexOf(WetMass);
+                var index = steps > possibleSteps.IndexOf(24) ? steps - 2 : steps - 1;
+                FuelTanks = possibleSteps[index] - DryMass;
+            }
         }
 
         private void PowerSatButton_Clicked(object sender, EventArgs e)
@@ -432,7 +462,6 @@ namespace HFCA
             powerSatPushed = !powerSatPushed;
             ((Button)sender).BackgroundColor = powerSatPushed ? Color.Green : Color.DarkRed;
             OnPropertyChanged(nameof(NetThrust));
-            BurnsLeftThisTurn = Math.Min(NetThrust, BurnsLeftAll);
         }
 
         private void SetFuelTanks(Grid grid)
@@ -490,7 +519,7 @@ namespace HFCA
                 DisplayAlert("Burn failed!", "No more burns left this turn.", "OK");
                 return;
             }
-            --BurnsLeftThisTurn;
+            ++burnsUsedThisTurn;
 
             LeftoverBurnedFuel += ActiveThruster.FuelUse;
             int burnedFuel = (int)LeftoverBurnedFuel;
@@ -510,6 +539,8 @@ namespace HFCA
 
             var stepNew = stepOrig - burnedFuel;
             FuelTanks = possibleSteps[stepNew] - DryMass;
+
+            OnPropertyChanged(nameof(turnAvailabilityLabel));
         }
 
         private void TurnButton_Clicked(object sender, EventArgs e)
@@ -517,26 +548,24 @@ namespace HFCA
             if (FreeTurns > 0)
             {
                 --FreeTurns;
-                //if (freeTurns == 0) ((Button)sender).BackgroundColor = Color.DeepPink;
                 return;
             }
-            if (burnsLeftThisTurn < 2)
+            if (BurnsLeftThisTurn < 2)
             {
                 DisplayAlert("Turn failed!", "No enough burns left this turn.", "OK");
                 return;
             }
             BurnButton_Clicked((object)sender, e);
             BurnButton_Clicked((object)sender, e);
-
-            //if (freeTurns == 0 && burnsLeftThisTurn < 2) ((Button)sender).BackgroundColor = Color.DarkRed;
         }
         
         private void EndTurn_Clicked(object sender, EventArgs e)
         {
             afterburnerUsed = false;
-            BurnsLeftThisTurn = Math.Min(NetThrust, BurnsLeftAll);
+            burnsUsedThisTurn = 0;
             OnPropertyChanged(nameof(AfterBurnButtonEnable));
-            OnPropertyChanged(nameof(NetThrust));
+            OnPropertyChanged(nameof(turnAvailabilityLabel));
+            OnPropertyChanged(nameof(BurnsLeftThisTurn));
 
             if (LeftoverBurnedFuel > 0)
             {
@@ -554,6 +583,7 @@ namespace HFCA
             else
                 solarBonus = 0;
             OnPropertyChanged(nameof(NetThrust));
+            OnPropertyChanged(nameof(BurnsLeftThisTurn));
         }
 
 
