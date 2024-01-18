@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Schema;
 using Xamarin.Essentials;
 using Xamarin.Forms;
 using Xamarin.Forms.Internals;
@@ -16,7 +18,7 @@ namespace HFCA
     public partial class Page1 : ContentPage
     {
         #region test
-        private List<Card> activeCards = new List<Card>()
+        private ObservableCollection<Card> activeCards = new ObservableCollection<Card>()
         { 
             new Card()
             {
@@ -31,8 +33,11 @@ namespace HFCA
                 IsPushable = false,
             }  
         };
-        private List<Card> inactiveCards = new List<Card>();
+        private ObservableCollection<Card> inactiveCards = new ObservableCollection<Card>();
         #endregion
+
+        private ObservableCollection<Card> ActiveCards { get { return activeCards; } set { activeCards = value; OnPropertyChanged(nameof(ActiveCards)); } }
+        private ObservableCollection<Card> InactiveCards { get { return inactiveCards; } set { inactiveCards = value; OnPropertyChanged(nameof(InactiveCards)); } }
 
         private readonly List<double> possibleSteps = new List<double>{
         1, 1+1/9d, 1+2/9d, 1+3/9d, 1+4/9d, 1+5/9d, 1+6/9d, 1+7/9d, 1+8/9d,
@@ -61,7 +66,7 @@ namespace HFCA
             "Neptun"
         };
 
-        private Card ActiveThruster { get { return activeCards.Single(x => x.Type == CardType.Thruster); } }
+        private Card ActiveThruster { get { return ActiveCards.Single(x => x.Type == CardType.Thruster); } }
         private int solarBonus;
         private bool afterburnerUsed = false;
         private bool powerSatPushed = false;
@@ -78,7 +83,7 @@ namespace HFCA
         
         //FUEL TANKS
         private double fuelTanks;
-        public double FuelTanks { get { return fuelTanks; } set { fuelTanks = value; OnPropertyChanged(nameof(FuelTanks)); OnPropertyChanged(nameof(fuelTanksLabelText)); OnPropertyChanged(nameof(massLabelText)); OnPropertyChanged(nameof(burnsLeftAllLabelText)); OnPropertyChanged(nameof(BurnsLeftThisTurn)); OnPropertyChanged(nameof(NetThrust)); } }
+        public double FuelTanks { get { return fuelTanks; } set { fuelTanks = value < 0 ? 0 : value + DryMass > 32 ? 32 - DryMass : value; OnPropertyChanged(nameof(FuelTanks)); OnPropertyChanged(nameof(fuelTanksLabelText)); OnPropertyChanged(nameof(massLabelText)); OnPropertyChanged(nameof(burnsLeftAllLabelText)); OnPropertyChanged(nameof(BurnsLeftThisTurn)); OnPropertyChanged(nameof(NetThrust)); } }
         public string fuelTanksLabelText { get => (((int)FuelTanks) == 0 && FuelTanks > 0) ? ToStepFractionCount() : ((int)FuelTanks).ToString() + " " + ToStepFractionCount(); }
 
         //BURNS LEFT
@@ -100,11 +105,15 @@ namespace HFCA
         public double LeftoverBurnedFuel { get => leftoverBurnedFuel; set { leftoverBurnedFuel = value; OnPropertyChanged(nameof(endTurnButtonText)); } }
 
         //NET THRUST
-        private int netThrust;
+        private bool isDuringMovement;
+        private int currentNetThrust;
         private int finalNetThrust;
-        public int NetThrust { 
-            get 
+        public int NetThrust
+        {
+            get
             {
+                if (isDuringMovement) return currentNetThrust;
+
                 finalNetThrust = ActiveThruster.Thrust;
                 if (ActiveThruster.IsSolarPowered)
                 {
@@ -126,16 +135,10 @@ namespace HFCA
                     finalNetThrust -= 1;
                 else finalNetThrust -= 2;
 
-                return Math.Min(finalNetThrust, 15); // max value 15
-            } 
-            set 
-            { 
-                netThrust = value; 
-                OnPropertyChanged(nameof(NetThrust));
-                OnPropertyChanged(nameof(BurnsLeftThisTurn));
-                OnPropertyChanged(nameof(turnAvailabilityLabel));
-            } }
-
+                currentNetThrust = Math.Min(finalNetThrust, 15);
+                return currentNetThrust;
+            }
+        }
         
         public string endTurnButtonText { get => LeftoverBurnedFuel > 0d ? "End Turn\n (loose " + Math.Round(1-LeftoverBurnedFuel, 2).ToString() +" step)" : "End\nTurn"; }
         public bool AfterBurnButtonEnable { get => !afterburnerUsed 
@@ -145,11 +148,15 @@ namespace HFCA
 
         public Page1()
         {
+            activeCards.CollectionChanged += ActiveCards_CollectionChanged;
+
             InitializeComponent();
             BindingContext = this;
             SetupPage();
 
         }
+
+        
 
         private void SetupPage()
         {
@@ -182,7 +189,7 @@ namespace HFCA
 
             ListView CardList = new ListView()
             {
-                ItemsSource = activeCards,
+                ItemsSource = ActiveCards,
                 ItemTemplate = new DataTemplate(() => {
                     Label nameLabel = new Label();
                     nameLabel.SetBinding(Label.TextProperty, "Name");
@@ -194,9 +201,22 @@ namespace HFCA
                 }),
                 BindingContext = this,
             };
-            CardList.DescendantAdded += CardList_Changed;
-            CardList.DescendantRemoved += CardList_Changed;
             mainPageLayout.Children.Add(CardList);
+
+            Button AddCardButton = new Button()
+            {
+                Text = "+",
+                HorizontalOptions = LayoutOptions.Center,
+                VerticalOptions = LayoutOptions.Start,
+                HeightRequest = 50,
+                WidthRequest = 50,
+                CornerRadius = 25,
+                BackgroundColor = Color.Yellow,
+                FontSize = 18,
+                BindingContext = this,
+            };
+            AddCardButton.Clicked += AddCardButton_Clicked;
+            mainPageLayout.Children.Add(AddCardButton);
             
             Grid buttonGrid = new Grid()
             {
@@ -264,13 +284,27 @@ namespace HFCA
             BurnButton.Clicked += BurnButton_Clicked;
             buttonGrid.Children.Add(BurnButton, 1,5,0,2);
 
-            CardList_Changed(CardList, null); // TEST
+            ActiveCards_CollectionChanged(null, null);
             this.Content = mainPageLayout;
         }
 
-        private void CardList_Changed(object sender, ElementEventArgs e)
+        private void AddCardButton_Clicked(object sender, EventArgs e)
         {
-            var allCards = activeCards.Concat(inactiveCards);
+            //if (DryMass > 23)
+
+            ActiveCards.Add(new Card() { Name = "NEW CARD", Mass = 1, RadHard = 5, Type = CardType.Reactor });
+            OnPropertyChanged(nameof(ActiveCards));
+
+            if (WetMass > 32)
+            {
+                DisplayAlert("Too heavy", "Adding card changed wet mass over maximum. Reducing fuel tanks by " + (WetMass - 32), "OK");
+                FuelTanks -= WetMass - 32;
+            }
+        }
+
+        private void ActiveCards_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            var allCards = ActiveCards.Concat(InactiveCards);
             DryMass = allCards.Sum(x => x.Mass);
             MinRadHard = allCards.Min(x => x.RadHard);
         }
@@ -514,6 +548,8 @@ namespace HFCA
 
         private void BurnButton_Clicked(object sender, EventArgs e)
         {
+            if (isDuringMovement == false) isDuringMovement = true;
+
             if (BurnsLeftThisTurn == 0)
             {
                 DisplayAlert("Burn failed!", "No more burns left this turn.", "OK");
@@ -561,11 +597,13 @@ namespace HFCA
         
         private void EndTurn_Clicked(object sender, EventArgs e)
         {
+            isDuringMovement = false;
             afterburnerUsed = false;
             burnsUsedThisTurn = 0;
             OnPropertyChanged(nameof(AfterBurnButtonEnable));
             OnPropertyChanged(nameof(turnAvailabilityLabel));
             OnPropertyChanged(nameof(BurnsLeftThisTurn));
+            OnPropertyChanged(nameof(NetThrust));
 
             if (LeftoverBurnedFuel > 0)
             {
@@ -574,6 +612,8 @@ namespace HFCA
                 FuelTanks = possibleSteps[index] - DryMass;
             }
             LeftoverBurnedFuel = 0;
+
+
         }
 
         private void HelioZonePicked (object sender, EventArgs e)
