@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Text;
 
 namespace HFCA
@@ -12,7 +13,6 @@ namespace HFCA
     {
         Crew,
         Thruster,
-        RegolitThruster,
         Radiator,
         Reactor,
         Generator,
@@ -47,5 +47,37 @@ namespace HFCA
         //public bool isRobot { get; set; }
         //public int ISRU { get; set; }
         //public RobonautType RobonautType { get; set; }
+
+        public Color Color
+        {
+            get
+            {
+                switch (Type)
+                {
+                    case CardType.Thruster:
+                        return Color.Yellow;
+                    case CardType.Generator:
+                        return Color.Orange;
+                    case CardType.Reactor:
+                        return Color.MediumPurple;
+                    case CardType.Robonaut:
+                        return Color.DeepPink;
+                    case CardType.Radiator:
+                        return Color.LightBlue;
+                    case CardType.Rafinery:
+                        return Color.Gray;
+                    case CardType.GwTwThruster:
+                        return Color.Yellow;
+                    case CardType.Colonist:
+                        return Color.DarkGray;
+                    case CardType.Freighter:
+                        return Color.Blue;
+                    case CardType.Bernal:
+                        return Color.LightYellow;
+                    default:
+                        return Color.White;
+                }
+            }
+        }
     }
 }

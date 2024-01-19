@@ -142,7 +142,7 @@ namespace HFCA
         
         public string endTurnButtonText { get => LeftoverBurnedFuel > 0d ? "End Turn\n (loose " + Math.Round(1-LeftoverBurnedFuel, 2).ToString() +" step)" : "End\nTurn"; }
         public bool AfterBurnButtonEnable { get => !afterburnerUsed 
-                || ((ActiveThruster.Type == CardType.Thruster || ActiveThruster.Type == CardType.RegolitThruster) && stepsLeft < ActiveThruster.AfterBurn)
+                || (ActiveThruster.Type == CardType.Thruster && stepsLeft < ActiveThruster.AfterBurn)
                 || ActiveThruster.Type == CardType.GwTwThruster && stepsLeft < 1; }
         public bool isPushable { get => ActiveThruster.IsPushable; }
 
@@ -434,7 +434,6 @@ namespace HFCA
                 ItemsSource = HelioZones,
                 BindingContext = this,
                 WidthRequest = 50,
-                
             };
             HelioZonePicker.SelectedIndexChanged += HelioZonePicked;
             netThrustStack.Children.Add(HelioZonePicker);
