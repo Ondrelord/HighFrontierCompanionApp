@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Text;
+using Xamarin.Forms;
 
 namespace HFCA
 {
@@ -79,5 +79,93 @@ namespace HFCA
                 }
             }
         }
+        public readonly DataTemplate DataTemplate = new DataTemplate(() => 
+        {
+            var itemStack = new StackLayout()
+            {
+                Orientation = StackOrientation.Horizontal,
+                HorizontalOptions = LayoutOptions.FillAndExpand,
+                Margin = 2,
+                HeightRequest = 25,
+            };
+            itemStack.SetBinding(StackLayout.BackgroundColorProperty, "Color");
+
+            Label nameLabel = new Label()
+            {
+                HorizontalOptions = LayoutOptions.StartAndExpand,
+                VerticalTextAlignment = TextAlignment.Center,
+            };
+            nameLabel.SetBinding(Label.TextProperty, "Name");
+            itemStack.Children.Add(nameLabel);
+
+            Label massLabel = new Label()
+            {
+                VerticalTextAlignment = TextAlignment.Center,
+                HorizontalTextAlignment = TextAlignment.Center,
+                WidthRequest = 20,
+            };
+            massLabel.SetBinding(Label.TextProperty, "Mass");
+            itemStack.Children.Add(massLabel);
+
+            Label radLabel = new Label()
+            {
+                VerticalTextAlignment = TextAlignment.Center,
+                HorizontalTextAlignment = TextAlignment.Center,
+                WidthRequest = 20,
+            };
+            radLabel.SetBinding(Label.TextProperty, "RadHard");
+            itemStack.Children.Add(radLabel);
+
+            var symbolStack = new StackLayout() { Orientation = StackOrientation.Vertical, WidthRequest = 50, HeightRequest = 25, Padding = -3, Spacing = -7.5};
+            itemStack.Children.Add(symbolStack);
+
+            Label suppLabel = new Label()
+            {
+                VerticalTextAlignment = TextAlignment.Center,
+                HorizontalTextAlignment = TextAlignment.Center,
+            };
+            suppLabel.SetBinding(Label.TextProperty, "Supports");
+            symbolStack.Children.Add(suppLabel);
+
+            Label reqLabel = new Label()
+            {
+                VerticalTextAlignment = TextAlignment.Center,
+                HorizontalTextAlignment = TextAlignment.Center,
+            };
+            reqLabel.SetBinding(Label.TextProperty, "Requirements");
+            symbolStack.Children.Add(reqLabel);
+
+            Label thrustLabel = new Label()
+            {
+                VerticalTextAlignment = TextAlignment.Center,
+                HorizontalTextAlignment = TextAlignment.Center,
+                WidthRequest = 30,
+            };
+            thrustLabel.SetBinding(Label.TextProperty, "Thrust");
+            itemStack.Children.Add(thrustLabel);
+
+            Label fuelLabel = new Label()
+            {
+                VerticalTextAlignment = TextAlignment.Center,
+                HorizontalTextAlignment = TextAlignment.Center,
+                WidthRequest = 30,
+            };
+            fuelLabel.SetBinding(Label.TextProperty, "FuelUse");
+            itemStack.Children.Add(fuelLabel);
+
+            Label afterLabel = new Label()
+            {
+                VerticalTextAlignment = TextAlignment.Center,
+                HorizontalTextAlignment = TextAlignment.Center,
+                WidthRequest = 30,
+            };
+            afterLabel.SetBinding(Label.TextProperty, "AfterBurn");
+            itemStack.Children.Add(afterLabel);
+
+            return new ViewCell
+            {
+                View = itemStack,
+            };
+        });
     }
 }

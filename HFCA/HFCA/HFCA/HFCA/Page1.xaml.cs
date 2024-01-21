@@ -186,22 +186,27 @@ namespace HFCA
             SetFuelTanks(grid);
             SetBurnsLeft(grid);
 
-
             ListView CardList = new ListView()
             {
                 ItemsSource = ActiveCards,
-                ItemTemplate = new DataTemplate(() => {
-                    Label nameLabel = new Label();
-                    nameLabel.SetBinding(Label.TextProperty, "Name");
-
-                    return new ViewCell
-                    {
-                        View = nameLabel,
-                    };
-                }),
+                ItemTemplate = new Card().DataTemplate,
+                HasUnevenRows = true,
                 BindingContext = this,
             };
             mainPageLayout.Children.Add(CardList);
+            mainPageLayout.Children.Add(new BoxView() { BackgroundColor = Color.Black, HorizontalOptions = LayoutOptions.FillAndExpand, HeightRequest = 2 });
+            mainPageLayout.Children.Add(new Label()
+            {
+                Text = "Inactive cards",
+            });
+            ListView InactiveCardList = new ListView()
+            {
+                ItemsSource = InactiveCards,
+                ItemTemplate = new Card().DataTemplate,
+                HasUnevenRows = true,
+                BindingContext = this,
+            };
+            mainPageLayout.Children.Add(InactiveCardList);
 
             Button AddCardButton = new Button()
             {
@@ -288,11 +293,32 @@ namespace HFCA
             this.Content = mainPageLayout;
         }
 
+        private CardPickerPage CardPage;
         private void AddCardButton_Clicked(object sender, EventArgs e)
         {
-            //if (DryMass > 23)
+            CardPage = new CardPickerPage();
+            CardPage.Disappearing += ReturnFromCardPickerPage;
 
-            ActiveCards.Add(new Card() { Name = "NEW CARD", Mass = 1, RadHard = 5, Type = CardType.Reactor });
+            Navigation.PushAsync(CardPage);
+        }
+
+        private void ReturnFromCardPickerPage(object sender, EventArgs e)
+        {
+            var SelectedCard = CardPage.SelectedCard;
+
+            if (SelectedCard == null) return;
+
+            if (DryMass + SelectedCard.Mass > 23)
+            {
+                DisplayAlert("Too heavy", "Chosen card is too heavy", "OK");
+                return;
+            }
+
+            if ((SelectedCard.Type == CardType.Thruster || SelectedCard.Type == CardType.GwTwThruster)
+                && ActiveCards.SingleOrDefault(x => x.Type == CardType.Thruster || x.Type == CardType.GwTwThruster) != null)
+                InactiveCards.Add(SelectedCard);
+            else
+                ActiveCards.Add(SelectedCard);
             OnPropertyChanged(nameof(ActiveCards));
 
             if (WetMass > 32)

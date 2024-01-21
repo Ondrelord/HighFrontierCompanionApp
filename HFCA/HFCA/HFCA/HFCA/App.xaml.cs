@@ -10,8 +10,7 @@ namespace HFCA
         {
             InitializeComponent();
 
-            MainPage = new Page1();
-            MainPage = new CardPickerPage();
+            MainPage = new NavigationPage(new Page1());
         }
 
         protected override void OnStart()

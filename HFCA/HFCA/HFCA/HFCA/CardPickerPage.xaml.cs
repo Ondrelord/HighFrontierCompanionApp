@@ -14,6 +14,8 @@ namespace HFCA
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class CardPickerPage : ContentPage
     {
+        public Card SelectedCard { get => CardListView.SelectedItem as Card; }
+
         private ObservableCollection<Card> allCards = new ObservableCollection<Card>()
         {
             new Card() 
@@ -72,6 +74,7 @@ namespace HFCA
             } }
 
         private Picker typePicker = null;
+        private ListView CardListView;
 
         public CardPickerPage()
         {
@@ -105,18 +108,19 @@ namespace HFCA
             pickerStack.Children.Add(cancelChoiceButton);
 
             #region Title
-            var TitleStack = new StackLayout() { Orientation = StackOrientation.Horizontal, HeightRequest = 40};
+            var TitleStack = new StackLayout() { Orientation = StackOrientation.Horizontal, HeightRequest = 50, Padding = -10};
             MainStack.Children.Add(TitleStack);
             TitleStack.Children.Add(new Label()
             {
                 Text = "Name",
-                WidthRequest = 200,
+                HorizontalOptions= LayoutOptions.StartAndExpand,
                 VerticalTextAlignment = TextAlignment.Center,
+                Padding = 10
             });
             TitleStack.Children.Add(new Label()
             {
                 Text = "Mss",
-                WidthRequest = 30,
+                WidthRequest = 28,
                 HeightRequest = 30,
                 Rotation = 90,
                 VerticalTextAlignment = TextAlignment.Center,
@@ -125,7 +129,7 @@ namespace HFCA
             TitleStack.Children.Add(new Label()
             {
                 Text = "RH",
-                WidthRequest = 30,
+                WidthRequest = 25,
                 HeightRequest = 30,
                 Rotation = 90,
                 VerticalTextAlignment = TextAlignment.Center,
@@ -144,7 +148,7 @@ namespace HFCA
                 WidthRequest = 30,
                 HeightRequest = 30,
                 Rotation = 90,
-                VerticalTextAlignment = TextAlignment.Center,
+                VerticalTextAlignment = TextAlignment.End,
                 HorizontalTextAlignment = TextAlignment.Center,
             });
             TitleStack.Children.Add(new Label()
@@ -153,7 +157,7 @@ namespace HFCA
                 WidthRequest = 30,
                 HeightRequest = 30,
                 Rotation = 90,
-                VerticalTextAlignment = TextAlignment.Center,
+                VerticalTextAlignment = TextAlignment.End,
                 HorizontalTextAlignment = TextAlignment.Center,
             });
             TitleStack.Children.Add(new Label()
@@ -162,106 +166,21 @@ namespace HFCA
                 WidthRequest = 30,
                 HeightRequest = 30,
                 Rotation = 90,
-                VerticalTextAlignment = TextAlignment.Center,
+                VerticalTextAlignment = TextAlignment.End,
                 HorizontalTextAlignment = TextAlignment.Center,
             });
             #endregion
 
-            var CardListView = new ListView()
+            CardListView = new ListView()
             {
                 ItemsSource = AllCards,
                 SelectionMode = ListViewSelectionMode.Single,
-                ItemTemplate = new DataTemplate(() => {
-                    var itemStack = new StackLayout()
-                    {
-                        Orientation = StackOrientation.Horizontal,
-                        HorizontalOptions = LayoutOptions.FillAndExpand,
-                    };
-                    itemStack.SetBinding(StackLayout.BackgroundColorProperty, "Color");
-                    
-                    Label nameLabel = new Label()
-                    {
-                        WidthRequest = 200,
-                        VerticalTextAlignment = TextAlignment.Center,
-                    };
-                    nameLabel.SetBinding(Label.TextProperty, "Name");
-                    itemStack.Children.Add(nameLabel);
-                    
-                    Label massLabel = new Label()
-                    {
-                        VerticalTextAlignment = TextAlignment.Center,
-                        HorizontalTextAlignment = TextAlignment.Center,
-                        WidthRequest = 20,
-                    };
-                    massLabel.SetBinding(Label.TextProperty, "Mass");
-                    itemStack.Children.Add(massLabel);
-
-                    Label radLabel = new Label()
-                    {
-                        VerticalTextAlignment = TextAlignment.Center,
-                        HorizontalTextAlignment = TextAlignment.Center,
-                        WidthRequest = 20,
-                    };
-                    radLabel.SetBinding(Label.TextProperty, "RadHard");
-                    itemStack.Children.Add(radLabel);
-
-                    var symbolStack = new StackLayout() { Orientation = StackOrientation.Vertical, WidthRequest = 50 };
-                    itemStack.Children.Add(symbolStack);
-
-                    Label suppLabel = new Label()
-                    {
-                        VerticalTextAlignment = TextAlignment.Center,
-                        HorizontalTextAlignment = TextAlignment.Center,
-                    };
-                    suppLabel.SetBinding(Label.TextProperty, "Supports");
-                    symbolStack.Children.Add(suppLabel);
-                    
-                    Label reqLabel = new Label()
-                    {
-                        VerticalTextAlignment = TextAlignment.Center,
-                        HorizontalTextAlignment = TextAlignment.Center,
-                    };
-                    reqLabel.SetBinding(Label.TextProperty, "Requirements");
-                    symbolStack.Children.Add(reqLabel);
-
-                    Label thrustLabel = new Label()
-                    {
-                        VerticalTextAlignment = TextAlignment.Center,
-                        HorizontalTextAlignment = TextAlignment.Center,
-                        WidthRequest = 30,
-                    };
-                    thrustLabel.SetBinding(Label.TextProperty, "Thrust");
-                    itemStack.Children.Add(thrustLabel);
-
-                    Label fuelLabel = new Label()
-                    {
-                        VerticalTextAlignment = TextAlignment.Center,
-                        HorizontalTextAlignment = TextAlignment.Center,
-                        WidthRequest = 30,
-                    };
-                    fuelLabel.SetBinding(Label.TextProperty, "FuelUse");
-                    itemStack.Children.Add(fuelLabel);
-
-                    Label afterLabel = new Label()
-                    {
-                        VerticalTextAlignment = TextAlignment.Center,
-                        HorizontalTextAlignment = TextAlignment.Center,
-                        WidthRequest = 30,
-                    };
-                    afterLabel.SetBinding(Label.TextProperty, "AfterBurn");
-                    itemStack.Children.Add(afterLabel);
-
-                    return new ViewCell
-                    {
-                        View = itemStack,
-                    };
-                    
-                }),
+                ItemTemplate = new Card().DataTemplate,
+                HasUnevenRows = true,
                 BindingContext = this,
             };
             CardListView.SetBinding(ListView.ItemsSourceProperty, "AllCards");
             MainStack.Children.Add(CardListView);
-
 
 
             var buttonStack = new StackLayout() { Orientation = StackOrientation.Horizontal, VerticalOptions = LayoutOptions.End };
@@ -293,12 +212,13 @@ namespace HFCA
 
         private void BackButton_Clicked(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
+            CardListView.SelectedItem = null;
+            Navigation.PopAsync();
         }
 
         private void ChooseButton_Clicked(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
+            Navigation.PopAsync();
         }
     }
 }
