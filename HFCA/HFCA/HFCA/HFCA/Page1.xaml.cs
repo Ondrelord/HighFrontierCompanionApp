@@ -66,7 +66,26 @@ namespace HFCA
             "Neptun"
         };
 
-        private Card ActiveThruster { get { return ActiveCards.Single(x => x.Type == CardType.Thruster); } }
+        private Card ActiveThruster 
+        {
+            get 
+            {
+                var at = ActiveCards.SingleOrDefault(x => x.Type == CardType.Thruster);
+                return at ?? new Card() 
+                {
+                    Name = "No Thruster",
+                    AfterBurn = 0,
+                    FreeTurns = 0,
+                    FuelUse = 0,
+                    IsPushable = false,
+                    IsSolarPowered = false,
+                    Mass = 0,
+                    RadHard = 0,
+                    Thrust = 0,
+                    Type = CardType.Thruster,
+                };
+            }
+        }
         private int solarBonus;
         private bool afterburnerUsed = false;
         private bool powerSatPushed = false;
@@ -90,7 +109,7 @@ namespace HFCA
         private int burnsUsedThisTurn;
                 
         public int BurnsLeftThisTurn { get { return Math.Min(NetThrust, BurnsLeftAll) - burnsUsedThisTurn; } }
-        public int BurnsLeftAll { get { return (int)(stepsLeft / ActiveThruster.FuelUse); } }
+        public int BurnsLeftAll { get { return ActiveThruster.FuelUse != 0 ? (int)(stepsLeft / ActiveThruster.FuelUse) : 999; } }
         public int stepsLeft { get => possibleSteps.Count(x => x >= DryMass && x < WetMass); }
         public string burnsLeftAllLabelText { get => BurnsLeftAll.ToString() + " (" + stepsLeft.ToString() + ")"; }
 
@@ -145,6 +164,8 @@ namespace HFCA
                 || (ActiveThruster.Type == CardType.Thruster && stepsLeft < ActiveThruster.AfterBurn)
                 || ActiveThruster.Type == CardType.GwTwThruster && stepsLeft < 1; }
         public bool isPushable { get => ActiveThruster.IsPushable; }
+        public bool isCardSelected { get => SelectedCard != null; }
+        public Card SelectedCard;
 
         public Page1()
         {
@@ -208,6 +229,11 @@ namespace HFCA
             };
             mainPageLayout.Children.Add(InactiveCardList);
 
+            
+
+            var cardButtons = new StackLayout() { Orientation = StackOrientation.Horizontal, HeightRequest = 50};
+            mainPageLayout.Children.Add(cardButtons);
+
             Button AddCardButton = new Button()
             {
                 Text = "+",
@@ -221,8 +247,79 @@ namespace HFCA
                 BindingContext = this,
             };
             AddCardButton.Clicked += AddCardButton_Clicked;
-            mainPageLayout.Children.Add(AddCardButton);
+            cardButtons.Children.Add(AddCardButton);
             
+            Button DeleteCardButton = new Button()
+            {
+                Text = "X",
+                HorizontalOptions = LayoutOptions.Center,
+                VerticalOptions = LayoutOptions.Start,
+                HeightRequest = 50,
+                WidthRequest = 50,
+                CornerRadius = 25,
+                BackgroundColor = Color.Yellow,
+                FontSize = 18,
+                BindingContext = this,
+            };
+            DeleteCardButton.SetBinding(Button.IsEnabledProperty, "isCardSelected");
+            DeleteCardButton.Clicked += DeleteCardButton_Clicked;
+            cardButtons.Children.Add(DeleteCardButton);
+            
+            Button MoveCardButton = new Button()
+            {
+                Text = "\\|/",
+                HorizontalOptions = LayoutOptions.Center,
+                VerticalOptions = LayoutOptions.Start,
+                HeightRequest = 50,
+                WidthRequest = 50,
+                CornerRadius = 25,
+                BackgroundColor = Color.Yellow,
+                FontSize = 15,
+                BindingContext = this,
+            };
+            MoveCardButton.SetBinding(Button.IsEnabledProperty, "isCardSelected");
+            MoveCardButton.Clicked += (sender, e) =>
+            {
+                if (ActiveCards.Contains(SelectedCard))
+                    ActiveCards.Remove(SelectedCard);
+                else
+                {
+                    ActiveCards.Add(SelectedCard);
+                    CardList.SelectedItem = SelectedCard;
+                }
+                if (InactiveCards.Contains(SelectedCard))
+                    InactiveCards.Remove(SelectedCard);
+                else
+                {
+                    InactiveCards.Add(SelectedCard);
+                    InactiveCardList.SelectedItem = SelectedCard;
+                }
+            };
+            cardButtons.Children.Add(MoveCardButton);
+
+            CardList.ItemSelected += (sender, e) =>
+            {
+                if (e.SelectedItem != null)
+                {
+                    SelectedCard = e.SelectedItem as Card;
+                    InactiveCardList.SelectedItem = null;
+                    MoveCardButton.Text = "\\|/";
+                    OnPropertyChanged(nameof(isCardSelected));
+                }
+            };
+            InactiveCardList.ItemSelected += (sender, e) =>
+            {
+                if (e.SelectedItem != null)
+                {
+                    SelectedCard = e.SelectedItem as Card;
+                    CardList.SelectedItem = null;
+                    MoveCardButton.Text = "/|\\";
+                    OnPropertyChanged(nameof(isCardSelected));
+                }
+            };
+
+            mainPageLayout.Children.Add(new BoxView() { BackgroundColor = Color.Black, HorizontalOptions = LayoutOptions.FillAndExpand, HeightRequest = 2 });
+
             Grid buttonGrid = new Grid()
             {
                 HorizontalOptions = LayoutOptions.FillAndExpand,
@@ -293,6 +390,18 @@ namespace HFCA
             this.Content = mainPageLayout;
         }
 
+        private void MoveCardButton_Clicked(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void DeleteCardButton_Clicked(object sender, EventArgs e)
+        {
+            ActiveCards.Remove(SelectedCard);
+            InactiveCards.Remove(SelectedCard);
+            SelectedCard = null;
+        }
+
         private CardPickerPage CardPage;
         private void AddCardButton_Clicked(object sender, EventArgs e)
         {
@@ -332,7 +441,7 @@ namespace HFCA
         {
             var allCards = ActiveCards.Concat(InactiveCards);
             DryMass = allCards.Sum(x => x.Mass);
-            MinRadHard = allCards.Min(x => x.RadHard);
+            MinRadHard = allCards.Any() ? allCards.Min(x => x.RadHard) : 0;
         }
 
         private void SetBurnsLeft(Grid grid)
