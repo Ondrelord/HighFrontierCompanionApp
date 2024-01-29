@@ -16,68 +16,23 @@ namespace HFCA
     {
         public Card SelectedCard { get => CardListView.SelectedItem as Card; }
 
-        private ObservableCollection<Card> allCards = new ObservableCollection<Card>()
-        {
-            new Card() 
-            {
-                Name = "Test Thruster",
-                AfterBurn = 2,
-                FreeTurns = 1,
-                FuelUse = 2,
-                IsPushable = false,
-                IsSolarPowered = false,
-                Mass = 4,
-                RadHard = 5,
-                Thrust = 3,
-                Type = CardType.Thruster,
-                Requirements = "Xt",
-            },
-            new Card() 
-            {
-                Name = "Test Generator",
-                Mass = 2,
-                RadHard = 3,
-                Type = CardType.Generator,
-                Supports = "e",
-                Requirements = "t",
-            },
-            new Card() 
-            {
-                Name = "Test Reactor",
-                IsThrustModificator = true,
-                AfterBurn = 2,
-                FuelUse = 1/4d,
-                IsSolarPowered = true,
-                Mass = 2,
-                RadHard = 7,
-                Type = CardType.Reactor,
-                Supports = "X",
-                Requirements = "e",
-            },
-            new Card() 
-            {
-                Name = "Test Robonaut",
-                AfterBurn = 1,
-                FuelUse = 4,
-                Mass = 3,
-                RadHard = 1,
-                Thrust = 5,
-                Type = CardType.Robonaut,
-                Requirements = "X",
-            },
-        };
+        private ObservableCollection<Card> allCards;
         public ObservableCollection<Card> AllCards {
             get
             {
                 if (typePicker.SelectedIndex == -1) return allCards;
                 return new ObservableCollection<Card>(allCards.Where(x => x.Type == (CardType)typePicker.SelectedIndex));
-            } }
+            }
+            set => allCards = value;
+        }
 
         private Picker typePicker = null;
         private ListView CardListView;
 
         public CardPickerPage()
         {
+            AllCards = App.Database.GetCards();
+
             InitializeComponent();
             var MainStack = new StackLayout();
 

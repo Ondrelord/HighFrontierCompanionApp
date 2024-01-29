@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NuGet.Common;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -108,7 +109,7 @@ namespace HFCA
         //BURNS LEFT
         private int burnsUsedThisTurn;
                 
-        public int BurnsLeftThisTurn { get { return Math.Min(NetThrust, BurnsLeftAll) - burnsUsedThisTurn; } }
+        public int BurnsLeftThisTurn { get { return Math.Max(0, Math.Min(NetThrust, BurnsLeftAll)) - burnsUsedThisTurn; } }
         public int BurnsLeftAll { get { return ActiveThruster.FuelUse != 0 ? (int)(stepsLeft / ActiveThruster.FuelUse) : 999; } }
         public int stepsLeft { get => possibleSteps.Count(x => x >= DryMass && x < WetMass); }
         public string burnsLeftAllLabelText { get => BurnsLeftAll.ToString() + " (" + stepsLeft.ToString() + ")"; }
@@ -175,6 +176,7 @@ namespace HFCA
             BindingContext = this;
             SetupPage();
 
+            _ = App.Database;
         }
 
         
@@ -403,6 +405,7 @@ namespace HFCA
         }
 
         private CardPickerPage CardPage;
+
         private void AddCardButton_Clicked(object sender, EventArgs e)
         {
             CardPage = new CardPickerPage();

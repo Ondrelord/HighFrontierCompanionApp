@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SQLite;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using Xamarin.Forms;
@@ -26,6 +27,7 @@ namespace HFCA
 
     public class Card
     {
+        public int ID { get; set; }
         public CardType Type { get; set; }
 
         public double FuelUse { get; set; }
@@ -40,7 +42,7 @@ namespace HFCA
         public bool IsSolarPowered { get; set; }
         public bool IsThrustModificator { get; set; }
         public bool IsPushable { get; set; }
-        public Card RadiatorOtherSide { get; set; }
+        public int RadiatorOtherSideId { get; set; }
         //public int LoadLimit { get; set; }
         //public SpectralType SpectralType { get; set; }
         //public bool isHuman { get; set; }
@@ -48,6 +50,7 @@ namespace HFCA
         //public int ISRU { get; set; }
         //public RobonautType RobonautType { get; set; }
 
+        [Ignore]
         public Color Color
         {
             get
