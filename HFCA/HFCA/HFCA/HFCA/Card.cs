@@ -19,7 +19,7 @@ namespace HFCA
     }
     public enum SpectralType
     {
-        C,S,M,V,D
+        C,S,M,V,D,H
     }
     public enum CardType
     {
@@ -63,6 +63,7 @@ namespace HFCA
         public int ISRU { get; set; }
         public RobonautType RobonautType { get; set; }
         public string Ability { get; set; }
+        public bool HasPacman { get; set; }
 
         [Ignore]
         public Color Color
