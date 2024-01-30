@@ -272,7 +272,7 @@ namespace HFCA
                 {
                     if ((SelectedCard.Type == CardType.Thruster || SelectedCard.Type == CardType.GwTwThruster) && ActiveThruster.Name != "No Thruster")
                     {
-                        DisplayAlert("Move thruster", "You already have active thruster.", "OK");
+                        DisplayAlert("Move thruster - Error!", "You already have active thruster.", "OK");
                         return;
                     }
                     ActiveCards.Add(SelectedCard);

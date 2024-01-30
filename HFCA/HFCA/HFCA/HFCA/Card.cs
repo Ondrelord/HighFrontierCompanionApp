@@ -6,6 +6,11 @@ using Xamarin.Forms;
 
 namespace HFCA
 {
+    public enum Side
+    {
+        Front,
+        Back,
+    }
     public enum RobonautType
     {
         Rover,
@@ -57,6 +62,7 @@ namespace HFCA
         public bool isRobot { get; set; }
         public int ISRU { get; set; }
         public RobonautType RobonautType { get; set; }
+        public string Ability { get; set; }
 
         [Ignore]
         public Color Color

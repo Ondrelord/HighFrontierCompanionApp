@@ -20,13 +20,21 @@ namespace HFCA
         public ObservableCollection<Card> AllCards {
             get
             {
-                if (typePicker.SelectedIndex == -1) return allCards;
-                return new ObservableCollection<Card>(allCards.Where(x => x.Type == (CardType)typePicker.SelectedIndex));
+                ObservableCollection<Card> ret = allCards; 
+                
+                if (typePicker.SelectedIndex != -1)
+                    ret = new ObservableCollection<Card>(allCards.Where(x => x.Type == (CardType)typePicker.SelectedIndex));
+
+                if (sidePicker.SelectedIndex == 0) ret = new ObservableCollection<Card>(ret.Where(x => x.ID%2 == 1));
+                if (sidePicker.SelectedIndex == 1) ret = new ObservableCollection<Card>(ret.Where(x => x.ID%2 == 0));
+
+                return ret;
             }
             set => allCards = value;
         }
 
         private Picker typePicker = null;
+        private Picker sidePicker = null;
         private ListView CardListView;
 
         public CardPickerPage()
@@ -40,13 +48,22 @@ namespace HFCA
             MainStack.Children.Add(pickerStack);
             typePicker = new Picker()
             {
-                Title = "Pick card type",
+                Title = "Card type",
                 ItemsSource = Enum.GetValues(typeof(CardType)).Cast<CardType>().ToList(),
                 BindingContext = this,
                 HorizontalOptions = LayoutOptions.FillAndExpand,
             };
             typePicker.SelectedIndexChanged += TypePicker_SelectedIndexChanged;
             pickerStack.Children.Add(typePicker);
+            sidePicker = new Picker()
+            {
+                Title = "Side",
+                ItemsSource = Enum.GetValues(typeof(Side)).Cast<Side>().ToList(),
+                BindingContext = this,
+                HorizontalOptions = LayoutOptions.FillAndExpand,
+            };
+            sidePicker.SelectedIndexChanged += TypePicker_SelectedIndexChanged;
+            pickerStack.Children.Add(sidePicker);
             Button cancelChoiceButton = new Button()
             {
                 Text = "X",
@@ -60,6 +77,7 @@ namespace HFCA
                 FontSize = 9
             };
             cancelChoiceButton.Clicked += (sender, e) => typePicker.SelectedIndex = -1;
+            cancelChoiceButton.Clicked += (sender, e) => sidePicker.SelectedIndex = -1;
             pickerStack.Children.Add(cancelChoiceButton);
 
             #region Title
