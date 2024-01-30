@@ -6,6 +6,12 @@ using Xamarin.Forms;
 
 namespace HFCA
 {
+    public enum RobonautType
+    {
+        Rover,
+        Missile,
+        Laser
+    }
     public enum SpectralType
     {
         C,S,M,V,D
@@ -27,6 +33,7 @@ namespace HFCA
 
     public class Card
     {
+        [PrimaryKey]
         public int ID { get; set; }
         public CardType Type { get; set; }
 
@@ -42,13 +49,14 @@ namespace HFCA
         public bool IsSolarPowered { get; set; }
         public bool IsThrustModificator { get; set; }
         public bool IsPushable { get; set; }
-        public int RadiatorOtherSideId { get; set; }
-        //public int LoadLimit { get; set; }
-        //public SpectralType SpectralType { get; set; }
-        //public bool isHuman { get; set; }
-        //public bool isRobot { get; set; }
-        //public int ISRU { get; set; }
-        //public RobonautType RobonautType { get; set; }
+        public int OtherSideId { get; set; }
+        public int RadiatorOtherWeightId { get; set; }
+        public SpectralType SpectralType { get; set; }
+        public int LoadLimit { get; set; }
+        public bool isHuman { get; set; }
+        public bool isRobot { get; set; }
+        public int ISRU { get; set; }
+        public RobonautType RobonautType { get; set; }
 
         [Ignore]
         public Color Color

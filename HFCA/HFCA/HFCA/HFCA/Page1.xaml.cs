@@ -251,22 +251,6 @@ namespace HFCA
             AddCardButton.Clicked += AddCardButton_Clicked;
             cardButtons.Children.Add(AddCardButton);
             
-            Button DeleteCardButton = new Button()
-            {
-                Text = "X",
-                HorizontalOptions = LayoutOptions.Center,
-                VerticalOptions = LayoutOptions.Start,
-                HeightRequest = 50,
-                WidthRequest = 50,
-                CornerRadius = 25,
-                BackgroundColor = Color.Yellow,
-                FontSize = 18,
-                BindingContext = this,
-            };
-            DeleteCardButton.SetBinding(Button.IsEnabledProperty, "isCardSelected");
-            DeleteCardButton.Clicked += DeleteCardButton_Clicked;
-            cardButtons.Children.Add(DeleteCardButton);
-            
             Button MoveCardButton = new Button()
             {
                 Text = "\\|/",
@@ -286,11 +270,18 @@ namespace HFCA
                     ActiveCards.Remove(SelectedCard);
                 else
                 {
+                    if ((SelectedCard.Type == CardType.Thruster || SelectedCard.Type == CardType.GwTwThruster) && ActiveThruster.Name != "No Thruster")
+                    {
+                        DisplayAlert("Move thruster", "You already have active thruster.", "OK");
+                        return;
+                    }
                     ActiveCards.Add(SelectedCard);
                     CardList.SelectedItem = SelectedCard;
                 }
                 if (InactiveCards.Contains(SelectedCard))
+                {
                     InactiveCards.Remove(SelectedCard);
+                }
                 else
                 {
                     InactiveCards.Add(SelectedCard);
@@ -298,6 +289,54 @@ namespace HFCA
                 }
             };
             cardButtons.Children.Add(MoveCardButton);
+
+            var changeCardToOtherSide = new Button()
+            {
+                Text = "Flip",
+                HorizontalOptions = LayoutOptions.Center,
+                VerticalOptions = LayoutOptions.Start,
+                HeightRequest = 50,
+                WidthRequest = 50,
+                CornerRadius = 25,
+                BackgroundColor = Color.Yellow,
+                FontSize = 11,
+                BindingContext = this,
+            };
+            changeCardToOtherSide.SetBinding(Button.IsEnabledProperty, "isCardSelected");
+            changeCardToOtherSide.Clicked += (sender, e) =>
+            {
+                var otherSideCard = App.Database.GetCard(SelectedCard.OtherSideId).Result;
+
+                if (ActiveCards.Contains(SelectedCard))
+                {
+                    ActiveCards.Remove(SelectedCard);
+                    ActiveCards.Add(otherSideCard);
+                    CardList.SelectedItem = otherSideCard;
+                }
+                if (InactiveCards.Contains(SelectedCard))
+                {
+                    InactiveCards.Remove(SelectedCard);
+                    InactiveCards.Add(otherSideCard);
+                    InactiveCardList.SelectedItem = otherSideCard;
+                }
+            };
+            cardButtons.Children.Add(changeCardToOtherSide);
+
+            Button DeleteCardButton = new Button()
+            {
+                Text = "X",
+                HorizontalOptions = LayoutOptions.Center,
+                VerticalOptions = LayoutOptions.Start,
+                HeightRequest = 50,
+                WidthRequest = 50,
+                CornerRadius = 25,
+                BackgroundColor = Color.Yellow,
+                FontSize = 18,
+                BindingContext = this,
+            };
+            DeleteCardButton.SetBinding(Button.IsEnabledProperty, "isCardSelected");
+            DeleteCardButton.Clicked += DeleteCardButton_Clicked;
+            cardButtons.Children.Add(DeleteCardButton);
 
             CardList.ItemSelected += (sender, e) =>
             {
@@ -392,16 +431,12 @@ namespace HFCA
             this.Content = mainPageLayout;
         }
 
-        private void MoveCardButton_Clicked(object sender, EventArgs e)
-        {
-            throw new NotImplementedException();
-        }
-
         private void DeleteCardButton_Clicked(object sender, EventArgs e)
         {
             ActiveCards.Remove(SelectedCard);
             InactiveCards.Remove(SelectedCard);
             SelectedCard = null;
+            OnPropertyChanged(nameof(isCardSelected));
         }
 
         private CardPickerPage CardPage;
