@@ -220,7 +220,8 @@ namespace HFCA
                 AfterBurn = 1,
                 IsPushable = false,
                 IsSolarPowered = false,
-                Requirements = "Xt",
+                Requirements = "X",
+                Therms = -1,
             },
             new Card()
             {
@@ -237,7 +238,8 @@ namespace HFCA
                 AfterBurn = 1,
                 IsPushable = false,
                 IsSolarPowered = false,
-                Requirements = "Xt",
+                Requirements = "X",
+                Therms = -1,
             },
             new Card()
             {
@@ -271,7 +273,8 @@ namespace HFCA
                 AfterBurn = 1,
                 IsPushable = false,
                 IsSolarPowered = false,
-                Requirements = "~t",
+                Requirements = "~",
+                Therms = -1,
             },
             new Card()
             {
@@ -445,7 +448,8 @@ namespace HFCA
                 AfterBurn = 2,
                 IsPushable = false,
                 IsSolarPowered = false,
-                Requirements = "et",
+                Requirements = "e",
+                Therms = -1,
             },
             #endregion
             #region Reactors
@@ -477,7 +481,8 @@ namespace HFCA
                 Thrust = 0,
                 FuelUse = 1/4d,
                 Supports = "~B",
-                Requirements = "ttttt",
+                Requirements = "",
+                Therms = -5,
             },
             new Card()
             {
@@ -508,7 +513,8 @@ namespace HFCA
                 Thrust = 4,
                 FuelUse = 1/2d,
                 Supports = "B",
-                Requirements = "ttt",
+                Requirements = "",
+                Therms = -3,
             },
             new Card()
             {
@@ -523,7 +529,8 @@ namespace HFCA
                 Thrust = 3,
                 FuelUse = 1/2d,
                 Supports = "~",
-                Requirements = "tt",
+                Requirements = "",
+                Therms = -2,
             },
             new Card()
             {
@@ -538,7 +545,8 @@ namespace HFCA
                 Thrust = 0,
                 FuelUse = 1/4d,
                 Supports = "X~B",
-                Requirements = "ttt",
+                Requirements = "",
+                Therms = -3,
             },
             new Card()
             {
@@ -598,7 +606,8 @@ namespace HFCA
                 Thrust = 0,
                 FuelUse = 1/2d,
                 Supports = "XB",
-                Requirements = "t",
+                Requirements = "",
+                Therms = -1,
             },
             new Card()
             {
@@ -613,7 +622,8 @@ namespace HFCA
                 Thrust = 4,
                 FuelUse = 1,
                 Supports = "B",
-                Requirements = "tt",
+                Requirements = "",
+                Therms = -2,
             },
             new Card()
             {
@@ -628,7 +638,8 @@ namespace HFCA
                 Thrust = 7,
                 FuelUse = 1,
                 Supports = "B",
-                Requirements = "tt",
+                Requirements = "",
+                Therms = -2,
             },
             new Card()
             {
@@ -674,7 +685,8 @@ namespace HFCA
                 Thrust = 4,
                 FuelUse = 1,
                 Supports = "~",
-                Requirements = "t",
+                Requirements = "",
+                Therms = -1,
             },
             new Card()
             {
@@ -689,7 +701,8 @@ namespace HFCA
                 Thrust = 2,
                 FuelUse = 1/2d,
                 Supports = "~",
-                Requirements = "t",
+                Requirements = "",
+                Therms = -1,
             },
             new Card()
             {
@@ -717,7 +730,8 @@ namespace HFCA
                 Thrust = 0,
                 FuelUse = 1/4d,
                 Supports = "~",
-                Requirements = "t",
+                Requirements = "",
+                Therms = -1,
             },
             new Card()
             {
@@ -732,7 +746,8 @@ namespace HFCA
                 Thrust = 7,
                 FuelUse = 1,
                 Supports = "B",
-                Requirements = "t",
+                Requirements = "",
+                Therms = -1,
             },
             new Card()
             {
@@ -747,7 +762,8 @@ namespace HFCA
                 Thrust = 8,
                 FuelUse = 1/4d,
                 Supports = "B",
-                Requirements = "Xttt",
+                Requirements = "X",
+                Therms = -3,
                 Ability = "When activated, Decommission colocated cards with Rad-Hard <4."
             },
             new Card()
@@ -763,7 +779,8 @@ namespace HFCA
                 Thrust = 0,
                 FuelUse = 1/2d,
                 Supports = "~",
-                Requirements = "t",
+                Requirements = "",
+                Therms = -1,
             },
             new Card()
             {
@@ -778,7 +795,8 @@ namespace HFCA
                 Thrust = 0,
                 FuelUse = 1/2d,
                 Supports = "X~",
-                Requirements = "t",
+                Requirements = "",
+                Therms = -1,
             },
             new Card()
             {
@@ -793,7 +811,8 @@ namespace HFCA
                 Thrust = 3,
                 FuelUse = 1,
                 Supports = "~",
-                Requirements = "tt",
+                Requirements = "",
+                Therms = -2,
             },
             new Card()
             {
@@ -1119,7 +1138,8 @@ namespace HFCA
                 IsThrustModificator = false,
                 HasPacman = true,
                 Supports = "ce",
-                Requirements = "~t",
+                Requirements = "~",
+                Therms = -1,
             },
             new Card()
             {
@@ -1149,7 +1169,8 @@ namespace HFCA
                 IsSolarPowered = false,
                 HasPacman = true,
                 Supports = "ce",
-                Requirements = "~Btt",
+                Requirements = "~B",
+                Therms = -2,
             },
             new Card()
             {
@@ -1212,7 +1233,8 @@ namespace HFCA
                 IsThrustModificator = false,
                 HasPacman = false,
                 Supports = "e",
-                Requirements = "~tt",
+                Requirements = "~",
+                Therms = -2,
             },
             new Card()
             {
@@ -1240,7 +1262,8 @@ namespace HFCA
                 IsThrustModificator = false,
                 HasPacman = false,
                 Supports = "ce",
-                Requirements = "Xt",
+                Requirements = "X",
+                Therms = -1,
             },
             new Card()
             {
@@ -1268,7 +1291,8 @@ namespace HFCA
                 IsThrustModificator = false,
                 HasPacman = true,
                 Supports = "e",
-                Requirements = "~Bt",
+                Requirements = "~B",
+                Therms = -1,
             },
             new Card()
             {
@@ -1359,7 +1383,8 @@ namespace HFCA
                 IsThrustModificator = false,
                 HasPacman = true,
                 Supports = "ce",
-                Requirements = "~Btt",
+                Requirements = "~B",
+                Therms = -2,
             },
             new Card()
             {
@@ -1375,7 +1400,8 @@ namespace HFCA
                 FuelUse = 1,
                 HasPacman = true,
                 Supports = "ce",
-                Requirements = "t",
+                Requirements = "",
+                Therms = -1,
             },
             new Card()
             {
@@ -1451,7 +1477,8 @@ namespace HFCA
                 IsThrustModificator = false,
                 HasPacman = true,
                 Supports = "e",
-                Requirements = "tt",
+                Requirements = "",
+                Therms = -2,
             },
             new Card()
             {
@@ -1467,7 +1494,8 @@ namespace HFCA
                 FuelUse = 1,
                 HasPacman = true,
                 Supports = "e",
-                Requirements = "~Bttt",
+                Requirements = "~B",
+                Therms = -3,
             },
             new Card()
             {
@@ -1546,7 +1574,8 @@ namespace HFCA
                 IsThrustModificator = false,
                 HasPacman = true,
                 Supports = "e",
-                Requirements = "~Btt",
+                Requirements = "~B",
+                Therms = -2,
             },
             new Card()
             {
@@ -1577,7 +1606,8 @@ namespace HFCA
                 IsSolarPowered = true,
                 HasPacman = false,
                 Supports = "e",
-                Requirements = "t",
+                Requirements = "",
+                Therms = -1,
             },
             new Card()
             {
@@ -1606,7 +1636,8 @@ namespace HFCA
                 IsSolarPowered = true,
                 HasPacman = false,
                 Supports = "e",
-                Requirements = "t",
+                Requirements = "",
+                Therms = -1,
             },
             new Card()
             {
@@ -1639,8 +1670,9 @@ namespace HFCA
                 Mass = 0,
                 RadHard = 1,
                 Type = CardType.Radiator,
-                Supports = "t",
+                Supports = "",
                 Requirements = "",
+                Therms = 1,
             },
             new Card()
             {
@@ -1652,8 +1684,9 @@ namespace HFCA
                 Mass = 0,
                 RadHard = 3,
                 Type = CardType.Radiator,
-                Supports = "t",
+                Supports = "",
                 Requirements = "",
+                Therms = 1,
             },
             new Card()
             {
@@ -1665,8 +1698,9 @@ namespace HFCA
                 Mass = 1,
                 RadHard = 0,
                 Type = CardType.Radiator,
-                Supports = "tt",
+                Supports = "",
                 Requirements = "",
+                Therms = 2,
             },
             new Card()
             {
@@ -1678,8 +1712,9 @@ namespace HFCA
                 Mass = 1,
                 RadHard = 2,
                 Type = CardType.Radiator,
-                Supports = "ttt",
+                Supports = "",
                 Requirements = "",
+                Therms = 3,
             },
             new Card()
             {
@@ -1691,8 +1726,9 @@ namespace HFCA
                 Mass = 4,
                 RadHard = 7,
                 Type = CardType.Radiator,
-                Supports = "tt",
+                Supports = "",
                 Requirements = "",
+                Therms = 2,
             },
             new Card()
             {
@@ -1704,8 +1740,9 @@ namespace HFCA
                 Mass = 0,
                 RadHard = 7,
                 Type = CardType.Radiator,
-                Supports = "t",
+                Supports = "",
                 Requirements = "",
+                Therms = 1,
             },
             new Card()
             {
@@ -1717,8 +1754,9 @@ namespace HFCA
                 Mass = 5,
                 RadHard = 7,
                 Type = CardType.Radiator,
-                Supports = "ttt",
+                Supports = "",
                 Requirements = "",
+                Therms = 3,
             },
             new Card()
             {
@@ -1730,8 +1768,9 @@ namespace HFCA
                 Mass = 1,
                 RadHard = 7,
                 Type = CardType.Radiator,
-                Supports = "tt",
+                Supports = "",
                 Requirements = "",
+                Therms = 2,
             },
             new Card()
             {
@@ -1743,8 +1782,9 @@ namespace HFCA
                 Mass = 1,
                 RadHard = 1,
                 Type = CardType.Radiator,
-                Supports = "t",
+                Supports = "",
                 Requirements = "",
+                Therms = 1,
             },
             new Card()
             {
@@ -1756,8 +1796,9 @@ namespace HFCA
                 Mass = 0,
                 RadHard = 5,
                 Type = CardType.Radiator,
-                Supports = "t",
+                Supports = "",
                 Requirements = "",
+                Therms = 1,
             },
             new Card()
             {
@@ -1769,8 +1810,9 @@ namespace HFCA
                 Mass = 2,
                 RadHard = 1,
                 Type = CardType.Radiator,
-                Supports = "tt",
+                Supports = "",
                 Requirements = "",
+                Therms = 2,
             },
             new Card()
             {
@@ -1782,8 +1824,9 @@ namespace HFCA
                 Mass = 1,
                 RadHard = 3,
                 Type = CardType.Radiator,
-                Supports = "ttt",
+                Supports = "",
                 Requirements = "",
+                Therms = 3,
             },
             new Card()
             {
@@ -1795,8 +1838,9 @@ namespace HFCA
                 Mass = 2,
                 RadHard = 6,
                 Type = CardType.Radiator,
-                Supports = "t",
+                Supports = "",
                 Requirements = "",
+                Therms = 1,
             },
             new Card()
             {
@@ -1808,8 +1852,9 @@ namespace HFCA
                 Mass = 1,
                 RadHard = 6,
                 Type = CardType.Radiator,
-                Supports = "t",
+                Supports = "",
                 Requirements = "",
+                Therms = 1,
             },
             new Card()
             {
@@ -1821,8 +1866,9 @@ namespace HFCA
                 Mass = 3,
                 RadHard = 6,
                 Type = CardType.Radiator,
-                Supports = "ttttt",
+                Supports = "",
                 Requirements = "",
+                Therms = 5,
                 Ability = "Switch to light side after 1st use."
             },
             new Card()
@@ -1835,8 +1881,9 @@ namespace HFCA
                 Mass = 2,
                 RadHard = 6,
                 Type = CardType.Radiator,
-                Supports = "tttttt",
+                Supports = "",
                 Requirements = "",
+                Therms = 6,
                 Ability = "Switch to light side after 1st use."
             },
             new Card()
@@ -1849,8 +1896,9 @@ namespace HFCA
                 Mass = 2,
                 RadHard = 6,
                 Type = CardType.Radiator,
-                Supports = "ttt",
+                Supports = "",
                 Requirements = "e",
+                Therms = 3,
             },
             new Card()
             {
@@ -1862,8 +1910,9 @@ namespace HFCA
                 Mass = 0,
                 RadHard = 5,
                 Type = CardType.Radiator,
-                Supports = "t",
+                Supports = "",
                 Requirements = "",
+                Therms = 1,
             },
             new Card()
             {
@@ -1875,8 +1924,9 @@ namespace HFCA
                 Mass = 3,
                 RadHard = 6,
                 Type = CardType.Radiator,
-                Supports = "tttt",
+                Supports = "",
                 Requirements = "e",
+                Therms = 4,
             },
             new Card()
             {
@@ -1888,8 +1938,9 @@ namespace HFCA
                 Mass = 1,
                 RadHard = 4,
                 Type = CardType.Radiator,
-                Supports = "tt",
+                Supports = "",
                 Requirements = "",
+                Therms = 2,
             },
             new Card()
             {
@@ -1901,8 +1952,9 @@ namespace HFCA
                 Mass = 2,
                 RadHard = 1,
                 Type = CardType.Radiator,
-                Supports = "tt",
+                Supports = "",
                 Requirements = "",
+                Therms = 2,
             },
             new Card()
             {
@@ -1914,8 +1966,9 @@ namespace HFCA
                 Mass = 0,
                 RadHard = 2,
                 Type = CardType.Radiator,
-                Supports = "tt",
+                Supports = "",
                 Requirements = "",
+                Therms = 2,
             },
             new Card()
             {
@@ -1927,8 +1980,9 @@ namespace HFCA
                 Mass = 3,
                 RadHard = 0,
                 Type = CardType.Radiator,
-                Supports = "ttt",
+                Supports = "",
                 Requirements = "",
+                Therms = 3,
             },
             new Card()
             {
@@ -1940,8 +1994,9 @@ namespace HFCA
                 Mass = 1,
                 RadHard = 1,
                 Type = CardType.Radiator,
-                Supports = "ttt",
+                Supports = "",
                 Requirements = "",
+                Therms = 3,
             },
             new Card()
             {
@@ -1953,8 +2008,9 @@ namespace HFCA
                 Mass = 1,
                 RadHard = 2,
                 Type = CardType.Radiator,
-                Supports = "tt",
+                Supports = "",
                 Requirements = "",
+                Therms = 2,
             },
             new Card()
             {
@@ -1966,8 +2022,9 @@ namespace HFCA
                 Mass = 0,
                 RadHard = 3,
                 Type = CardType.Radiator,
-                Supports = "tt",
+                Supports = "",
                 Requirements = "",
+                Therms = 2,
             },
             new Card()
             {
@@ -1979,8 +2036,9 @@ namespace HFCA
                 Mass = 2,
                 RadHard = 1,
                 Type = CardType.Radiator,
-                Supports = "tt",
+                Supports = "",
                 Requirements = "",
+                Therms = 2,
             },
             new Card()
             {
@@ -1992,8 +2050,9 @@ namespace HFCA
                 Mass = 1,
                 RadHard = 2,
                 Type = CardType.Radiator,
-                Supports = "ttt",
+                Supports = "",
                 Requirements = "",
+                Therms = 2,
             },
             new Card()
             {
@@ -2005,8 +2064,9 @@ namespace HFCA
                 Mass = 1,
                 RadHard = 4,
                 Type = CardType.Radiator,
-                Supports = "t",
+                Supports = "",
                 Requirements = "",
+                Therms = 1,
             },
             new Card()
             {
@@ -2018,8 +2078,9 @@ namespace HFCA
                 Mass = 0,
                 RadHard = 3,
                 Type = CardType.Radiator,
-                Supports = "tt",
+                Supports = "",
                 Requirements = "",
+                Therms = 2,
             },
             new Card()
             {
@@ -2031,8 +2092,9 @@ namespace HFCA
                 Mass = 4,
                 RadHard = 2,
                 Type = CardType.Radiator,
-                Supports = "tt",
+                Supports = "",
                 Requirements = "",
+                Therms = 2,
             },
             new Card()
             {
@@ -2044,8 +2106,9 @@ namespace HFCA
                 Mass = 1,
                 RadHard = 2,
                 Type = CardType.Radiator,
-                Supports = "ttt",
+                Supports = "",
                 Requirements = "",
+                Therms = 3,
             },
             new Card()
             {
@@ -2057,8 +2120,9 @@ namespace HFCA
                 Mass = 2,
                 RadHard = 1,
                 Type = CardType.Radiator,
-                Supports = "tt",
+                Supports = "",
                 Requirements = "",
+                Therms = 2,
             },
             new Card()
             {
@@ -2070,8 +2134,9 @@ namespace HFCA
                 Mass = 1,
                 RadHard = 6,
                 Type = CardType.Radiator,
-                Supports = "tt",
+                Supports = "",
                 Requirements = "",
+                Therms = 2,
             },
             new Card()
             {
@@ -2083,8 +2148,9 @@ namespace HFCA
                 Mass = 4,
                 RadHard = 0,
                 Type = CardType.Radiator,
-                Supports = "ttt",
+                Supports = "",
                 Requirements = "",
+                Therms = 3,
             },
             new Card()
             {
@@ -2096,8 +2162,9 @@ namespace HFCA
                 Mass = 2,
                 RadHard = 6,
                 Type = CardType.Radiator,
-                Supports = "ttt",
+                Supports = "",
                 Requirements = "",
+                Therms = 3,
             },
             new Card()
             {
@@ -2109,8 +2176,9 @@ namespace HFCA
                 Mass = 3,
                 RadHard = 4,
                 Type = CardType.Radiator,
-                Supports = "tt",
+                Supports = "",
                 Requirements = "",
+                Therms = 2,
             },
             new Card()
             {
@@ -2122,8 +2190,9 @@ namespace HFCA
                 Mass = 0,
                 RadHard = 4,
                 Type = CardType.Radiator,
-                Supports = "tt",
+                Supports = "",
                 Requirements = "",
+                Therms = 2,
             },
             new Card()
             {
@@ -2135,8 +2204,9 @@ namespace HFCA
                 Mass = 4,
                 RadHard = 4,
                 Type = CardType.Radiator,
-                Supports = "ttt",
+                Supports = "",
                 Requirements = "",
+                Therms = 3,
             },
             new Card()
             {
@@ -2148,8 +2218,9 @@ namespace HFCA
                 Mass = 1,
                 RadHard = 3,
                 Type = CardType.Radiator,
-                Supports = "ttt",
+                Supports = "",
                 Requirements = "",
+                Therms = 3,
             },
             new Card()
             {
@@ -2161,8 +2232,9 @@ namespace HFCA
                 Mass = 2,
                 RadHard = 3,
                 Type = CardType.Radiator,
-                Supports = "t",
+                Supports = "",
                 Requirements = "",
+                Therms = 1,
             },
             new Card()
             {
@@ -2174,8 +2246,9 @@ namespace HFCA
                 Mass = 1,
                 RadHard = 1,
                 Type = CardType.Radiator,
-                Supports = "tt",
+                Supports = "",
                 Requirements = "",
+                Therms = 2,
             },
             new Card()
             {
@@ -2187,8 +2260,9 @@ namespace HFCA
                 Mass = 4,
                 RadHard = 2,
                 Type = CardType.Radiator,
-                Supports = "tt",
+                Supports = "",
                 Requirements = "",
+                Therms = 2,
             },
             new Card()
             {
@@ -2200,8 +2274,9 @@ namespace HFCA
                 Mass = 2,
                 RadHard = 1,
                 Type = CardType.Radiator,
-                Supports = "tttt",
+                Supports = "",
                 Requirements = "",
+                Therms = 4,
             },
             new Card()
             {
@@ -2213,8 +2288,9 @@ namespace HFCA
                 Mass = 2,
                 RadHard = 3,
                 Type = CardType.Radiator,
-                Supports = "t",
+                Supports = "",
                 Requirements = "",
+                Therms = 1,
             },
             new Card()
             {
@@ -2226,8 +2302,9 @@ namespace HFCA
                 Mass = 1,
                 RadHard = 5,
                 Type = CardType.Radiator,
-                Supports = "t",
+                Supports = "",
                 Requirements = "",
+                Therms = 1,
             },
             new Card()
             {
@@ -2239,8 +2316,9 @@ namespace HFCA
                 Mass = 4,
                 RadHard = 2,
                 Type = CardType.Radiator,
-                Supports = "tt",
+                Supports = "",
                 Requirements = "",
+                Therms = 2,
             },
             new Card()
             {
@@ -2252,8 +2330,9 @@ namespace HFCA
                 Mass = 2,
                 RadHard = 5,
                 Type = CardType.Radiator,
-                Supports = "ttt",
+                Supports = "",
                 Requirements = "",
+                Therms = 3,
             },
 
             #endregion
@@ -2270,7 +2349,8 @@ namespace HFCA
                 Type = CardType.Robonaut,
                 RobonautType = RobonautType.Laser,
                 ISRU = 2,
-                Requirements = "~Bt",
+                Requirements = "~B",
+                Therms = -1,
             },
             new Card()
             {
@@ -2283,7 +2363,8 @@ namespace HFCA
                 Type = CardType.Robonaut,
                 RobonautType = RobonautType.Laser,
                 ISRU = 2,
-                Requirements = "t",
+                Requirements = "",
+                Therms = -1,
             },
             new Card()
             {
@@ -2296,7 +2377,8 @@ namespace HFCA
                 Type = CardType.Robonaut,
                 RobonautType = RobonautType.Rover,
                 ISRU = 2,
-                Requirements = "Xt",
+                Requirements = "X",
+                Therms = -1,
             },
             new Card()
             {
@@ -2312,7 +2394,8 @@ namespace HFCA
                 Type = CardType.Robonaut,
                 RobonautType = RobonautType.Missile,
                 ISRU = 0,
-                Requirements = "Xt",
+                Requirements = "X",
+                Therms = -1,
             },
             new Card()
             {
@@ -2351,7 +2434,8 @@ namespace HFCA
                 Type = CardType.Robonaut,
                 RobonautType = RobonautType.Laser,
                 ISRU = 1,
-                Requirements = "ct",
+                Requirements = "c",
+                Therms = -1,
             },
             new Card()
             {
@@ -2460,7 +2544,8 @@ namespace HFCA
                 Type = CardType.Robonaut,
                 RobonautType = RobonautType.Missile,
                 ISRU = 1,
-                Requirements = "ctt",
+                Requirements = "c",
+                Therms = -2,
             },
             new Card()
             {
@@ -2566,7 +2651,8 @@ namespace HFCA
                 Type = CardType.Robonaut,
                 RobonautType = RobonautType.Laser,
                 ISRU = 2,
-                Requirements = "tt",
+                Requirements = "",
+                Therms = -2,
             },
             new Card()
             {
@@ -2579,7 +2665,8 @@ namespace HFCA
                 Type = CardType.Robonaut,
                 RobonautType = RobonautType.Laser,
                 ISRU = 0,
-                Requirements = "et",
+                Requirements = "e",
+                Therms = -1,
             },
             new Card()
             {

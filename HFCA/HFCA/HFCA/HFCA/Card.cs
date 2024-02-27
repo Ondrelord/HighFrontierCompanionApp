@@ -50,6 +50,7 @@ namespace HFCA
         public string Name { get; set; }
         public string Requirements { get; set; }
         public string Supports { get; set; }
+        public int Therms { get; set; }
         public int FreeTurns { get; set; }
         public bool IsSolarPowered { get; set; }
         public bool IsThrustModificator { get; set; }
