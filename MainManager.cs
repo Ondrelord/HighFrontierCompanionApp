@@ -7,6 +7,19 @@ using static MainManager;
 using Unity.VisualScripting;
 
 
+public class ThrustTriangle
+{
+    public int Thrust { get; set; }
+    public double Fuel_Consumption_Double { get => Helper_functions.FractionToDouble(Fuel_Consumption); }
+    public string Fuel_Consumption { get; set; }
+    public string Fuel_Type { get; set; } //"Water", "Dirt", "Isotope", "Modification"
+    public int Bonus_Pivots { get; set; }
+    public int Afterburn { get; set; }
+    public bool Push { get; set; }
+    public bool Solar { get; set; }
+    public bool Pacman { get; set; }
+}
+
 public class Thruster
 {
     public int ID { get; set; }
@@ -14,14 +27,7 @@ public class Thruster
     public string Spectral_Type { get; set; }
     public int Mass { get; set; }
     public int Rad_Hard { get; set; }
-    public int Thrust { get; set; }
-    public double Fuel_Consumption_Double { get => Helper_functions.FractionToDouble(Fuel_Consumption); }
-    public string Fuel_Consumption { get; set; }
-    public string Fuel_Type { get; set; }
-    public int Bonus_Pivots { get; set; }
-    public int Afterburn { get; set; }
-    public bool Push { get; set; }
-    public bool Solar { get; set; }
+   
     public bool C_Generator { get; set; }
     public bool e_Generator { get; set; }
     public bool X_Reactor { get; set; }
@@ -30,6 +36,8 @@ public class Thruster
     public int Therms { get; set; }
     public string Ability { get; set; }
 
+    public ThrustTriangle ThrustTriangle { get; set; }
+
     public Thruster(SqliteDataReader reader)
     {
         this.ID = reader.GetInt32(0);
@@ -37,13 +45,7 @@ public class Thruster
         this.Spectral_Type = reader.GetString("Spectral_Type");
         this.Mass = reader.GetInt32("Mass");
         this.Rad_Hard = reader.GetInt32("Rad_Hard");
-        this.Thrust = reader.GetInt32("Thrust");
-        this.Fuel_Consumption = reader.GetString("Fuel_Consumption");
-        this.Fuel_Type = reader.GetString("Fuel_Type");
-        this.Bonus_Pivots = reader.GetInt32("Bonus_Pivots");
-        this.Afterburn = reader.GetInt32("Afterburn");
-        this.Push = reader.GetBoolean("Push");
-        this.Solar = reader.GetBoolean("Solar");
+
         this.C_Generator = reader.GetBoolean("C_Generator");
         this.e_Generator = reader.GetBoolean("e_Generator");
         this.X_Reactor = reader.GetBoolean("X_Reactor");
@@ -51,6 +53,15 @@ public class Thruster
         this.B_Reactor = reader.GetBoolean("B_Reactor");
         this.Therms = reader.GetInt32("Therms");
         this.Ability = reader.GetString("Ability");
+        
+        this.ThrustTriangle.Thrust = reader.GetInt32("Thrust");
+        this.ThrustTriangle.Fuel_Consumption = reader.GetString("Fuel_Consumption");
+        this.ThrustTriangle.Fuel_Type = reader.GetString("Fuel_Type");
+        this.ThrustTriangle.Bonus_Pivots = reader.GetInt32("Bonus_Pivots");
+        this.ThrustTriangle.Afterburn = reader.GetInt32("Afterburn");
+        this.ThrustTriangle.Push = reader.GetBoolean("Push");
+        this.ThrustTriangle.Solar = reader.GetBoolean("Solar");
+        this.ThrustTriangle.Pacman = false;
     }
 }
 
@@ -84,6 +95,25 @@ public static class Helper_functions
         24, 25, 26, 27, 28, 29, 30, 31, 32
         };
 
+    /// <summary>
+    /// String representation of the wet mass in steps.
+    /// </summary>
+    public string ToStepFractionCount()
+    {
+        int floorValue = (int)Math.Floor(WetMass);
+        int ceilValue = (int)Math.Ceiling(WetMass);
+
+        var indexFV = possibleSteps.IndexOf(floorValue);
+        var indexCV = possibleSteps.IndexOf(ceilValue);
+        var indexPV = possibleSteps.IndexOf(WetMass);
+
+        if (indexPV - indexFV == 0) return "";
+        return (indexPV - indexFV).ToString() + "/" + (indexCV - indexFV).ToString();
+    }
+
+    /// <summary>
+    /// Converts a string representation of a fraction to a double.
+    /// </summary>
     public static double FractionToDouble(string fraction)
     {
         double result;
@@ -121,6 +151,9 @@ public static class Helper_functions
 
 public class MainManager : MonoBehaviour
 {
+    public ShipStack ActiveShipStack;
+
+
     public GameObject CardPrefab;
     public GameObject CardContent;
 
@@ -188,6 +221,10 @@ public class Deck<Card, T>
             }
             return _cards;
         }
+        set
+        {
+            _cards = value;
+        }
     }
 
     private void FillDeck()
@@ -216,9 +253,9 @@ public class Deck<Card, T>
                 while (reader.Read())
                 {
                     var newCard = Card<T>();
-                    newCard.Frond = new T(reader); //read front side of the card
+                    newCard.Front = new T(reader); //read front side of the card
                     reader.Read();
-                    newCard.Frond = new T(reader); // read back side of the card
+                    newCard.Front = new T(reader); // read back side of the card
                     _cards.Add(newCard);
                 }
 
@@ -227,11 +264,32 @@ public class Deck<Card, T>
     }
 }
 
-public class ShipStack
+public class ShipStack : MonoBehaviour
 {
-    public Thruster ActiveThruster { get; set; }
+    public ThrustTriangle ActiveThrusterTriangle // Currently active thruster modified by reactors and generators
+    {
+        get
+        {
+            var activeThruster = ActiveCards.Single(x => x.ThrustTriangle != null && x.ThrustTriangle.Fuel_Type != "Modification").ThrustTriangle;
 
-    public bool isPushable { get; set; }
+            foreach (var card in ActiveCards)
+            {
+                if (card.ThrustTriangle != null && card.ThrustTriangle.Fuel_Type == "Modification")
+                {
+                    activeThruster.Thrust += card.ThrustTriangle.Thrust;
+                    activeThruster.Fuel_Consumption = (activeThruster.Fuel_Consumption_Double * card.ThrustTriangle.Fuel_Consumption_Double).ToString();
+                    activeThruster.Solar = activeThruster.Solar || card.ThrustTriangle.Solar;
+                    activeThruster.Pacman = activeThruster.Pacman || card.ThrustTriangle.Pacman;
+                }
+            }
+            return activeThruster;
+        }
+    } 
+
+    public List<Card> ActiveCards { get; set; }
+    public List<Card> CargoCards { get; set; } // Cards that does not affect thrusters or needs to be functional to be used
+
+    public bool isPushed { get; set; } // specify if ship has used power sat push
     public bool AfterburnUsed { get; set; } // spcify if afterburn is added to the net thrust or not
     public bool isSolarPowered { get; set; }
     public Helper_functions.HelioZones HelioZone { get; set; }
@@ -249,7 +307,7 @@ public class ShipStack
     // Burns
     public int BurnsUsedThisTurn;
     public int BurnsLeftThisTurn { get { return Math.Max(0, Math.Min(NetThrust, BurnsLeftAll)) - BurnsUsedThisTurn; } }
-    public int BurnsLeftAll { get { return ActiveThruster.Fuel_Consumption_Double != 0 ? (int)(stepsLeft / ActiveThruster.Fuel_Consumption_Double) : 999; } }
+    public int BurnsLeftAll { get { return ActiveThrusterTriangle.Fuel_Consumption_Double != 0 ? (int)(stepsLeft / ActiveThrusterTriangle.Fuel_Consumption_Double) : 999; } }
     public int stepsLeft { get => Helper_functions.PossibleSteps.Count(x => x >= DryMass && x < WetMass); }
 
     // Free turns
@@ -257,6 +315,7 @@ public class ShipStack
 
     public double LeftoverBurnedFuel { get; set; }
 
+    // NET Thrust
     public bool isDuringMovement;
     public int RemainingThrust;
     public int finalNetThrust; // can be higher than 15
@@ -266,18 +325,18 @@ public class ShipStack
         {
             if (isDuringMovement) return RemainingThrust;
 
-            finalNetThrust = ActiveThruster.Thrust;
-            if (ActiveThruster.IsSolarPowered)
+            finalNetThrust = ActiveThrusterTriangle.ThrustTriangle.Thrust;
+            if (ActiveThrusterTriangle.ThrustTriangle.IsSolarPowered)
             {
                 if (solarBonus < -5)
                     return 0;
                 finalNetThrust += solarBonus;
             }
-            if (powerSatPushed)
+            if (isPushed)
                 ++finalNetThrust;
             if (afterburnerUsed)
-                if (ActiveThruster.Fuel_Type == "Isotope")
-                    finalNetThrust += ActiveThruster.Afterburn;
+                if (ActiveThrusterTriangle.Fuel_Type == "Isotope")
+                    finalNetThrust += ActiveThrusterTriangle.Afterburn;
                 else
                     ++finalNetThrust;
             if (WetMass < 2)
@@ -295,4 +354,68 @@ public class ShipStack
         }
     }
 
+    public void BurnButton_Clicked(object sender, EventArgs e)
+    {
+        if (isDuringMovement == false) isDuringMovement = true;
+
+        if (BurnsLeftThisTurn == 0)
+        {
+            DisplayAlert("Burn failed!", "No more burns left this turn.", "OK");
+            return;
+        }
+        ++burnsUsedThisTurn;
+
+        BurnFuel(ActiveThrusterTriangle.Fuel_Consumption_Double);
+    }
+    
+    public void BurnFuel(double fuelUsed)
+    {
+        LeftoverBurnedFuel += fuelUsed;
+        int burnedFuel = (int)LeftoverBurnedFuel;
+        LeftoverBurnedFuel -= burnedFuel;
+
+        var stepOrig = possibleSteps.IndexOf(WetMass);
+
+        var heavySteps = possibleSteps.IndexOf(24);
+        if (stepOrig > heavySteps)
+        {
+            double heavyStepsCount = stepOrig - heavySteps;
+            double modulo = heavyStepsCount / 2;
+            double doublePricedSteps = Math.Min(burnedFuel, modulo);
+            int bonusBurns = (int)Math.Ceiling(doublePricedSteps);
+            burnedFuel += bonusBurns;
+        }
+
+        var stepNew = stepOrig - burnedFuel;
+        FuelTanks = possibleSteps[stepNew] - DryMass;
+    }
+
+    // use afterburner
+    public void AfterBurnButton_Clicked(object sender, EventArgs e)
+    {
+        if (isDuringMovement)
+        {
+            // TODO: spawn warning message "Afterburnes should be used before start of movement"
+            // Choice "cancel" or "use anyway" => to ignore warning
+            return;
+        }
+
+        afterburnerUsed = true;
+
+        int stepCount = ActiveThrusterTriangle.Fuel_Type == "Isotope" ? 1 : ActiveThrusterTriangle.Afterburn;
+        BurnFuel(stepCount);
+    }
+    
+
+    // TODO: setting an auto powersat use
+    // power sat button switch
+    public void PowerSatButton_Clicked(object sender, EventArgs e)
+    {
+        isPushed = !isPushed;
+    }
+
 }   
+
+
+//TODO: some notification system for user and his actions
+//TODO: UNDO button
